@@ -76,7 +76,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             let selectedMeetingTime: String = delegate.pickerView!(sourceVC.meetingTimePicker, titleForRow: sourceVC.meetingTimePicker.selectedRowInComponent(0), forComponent: 0)!
             
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/selectedmeetingtime.php")!
+            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetingtime.php")!
             
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
@@ -182,9 +182,7 @@ class MUDetailSentInvitationViewController: UIViewController {
         let sourceVC:MUDetailMeetingLocationViewController = segue.sourceViewController as! MUDetailMeetingLocationViewController
         
         
-        self.HaveSelectedMeetingLocation = 1 //    0-not selected, 1-selected
-        sourceVC.GetToMeetLocationButton.hidden = false
-        sourceVC.HaveSelected = 1  //    0-not selected, 1-selected
+
            
             
         let meetingLocationNum = sourceVC.meetingLocationArray.count
@@ -201,6 +199,10 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             
             let selectedMeetingLocation: String = delegate.pickerView!(sourceVC.meetingLocationPicker, titleForRow: sourceVC.meetingLocationPicker.selectedRowInComponent(0), forComponent: 0)!
+
+            self.HaveSelectedMeetingLocation = 1 //    0-not selected, 1-selected
+            sourceVC.GetToMeetLocationButton.hidden = false
+            sourceVC.HaveSelected = 1  //    0-not selected, 1-selected
             
             AnInvitation?.selectedMeetingLocation = selectedMeetingLocation
             
@@ -209,7 +211,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/selectedmeetinglocation.php")!
+            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetinglocation.php")!
             
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
@@ -323,9 +325,11 @@ class MUDetailSentInvitationViewController: UIViewController {
                         = segue.destinationViewController as! MUDetailMeetingTimeViewController
             
             detailMeetingTimeVC.meetingTimeArray = AnInvitation!.MeetingTime
-            
+
             detailMeetingTimeVC.sourceVC = self.sourceVC
             detailMeetingTimeVC.HaveSelected = self.HaveSelectedMeetingTime
+            detailMeetingTimeVC.selectedMeetingTime = AnInvitation?.selectedMeetingTime
+            
 
         }
         else if segue.identifier == "SegueToDetailMeetingLocationVC"{
@@ -381,6 +385,18 @@ class MUDetailSentInvitationViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if ((self.AnInvitation?.haveSelectedMeetingLocationFlag) == true)
+        {
+            
+            self.HaveSelectedMeetingLocation = 1
+        }
+        
+        if ((self.AnInvitation?.haveSelectedMeetingTimeFlag) == true)
+        {
+            
+            self.HaveSelectedMeetingTime = 1
+        }
         
         
 

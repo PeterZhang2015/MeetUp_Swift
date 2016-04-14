@@ -74,13 +74,34 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
     }
     
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return meetingLocationArray.count
+        
+        if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
+        {
+            return 1
+            
+        }
+        else{
+          
+            return meetingLocationArray.count
+        }
+        
+        
     }
     
     
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
-        return meetingLocationArray[row]
+        
+        
+        if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
+        {
+            return selectedMeetingLocation
+            
+        }
+        else{
+            
+            return meetingLocationArray[row]
+        }
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

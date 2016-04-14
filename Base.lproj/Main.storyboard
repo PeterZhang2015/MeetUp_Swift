@@ -648,7 +648,7 @@ Password:</string>
                             </mask>
                         </variation>
                     </view>
-                    <navigationItem key="navigationItem" title="Invitation Detail" id="3Tt-I4-s28">
+                    <navigationItem key="navigationItem" title="Invitation Detail" id="3Tt-I4-s28" colorLabel="IBBuiltInLabel-Blue">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="ehA-hw-Nb6">
                             <connections>
                                 <action selector="cancelForDetailSentInvitationToReceivedInvitationVC:" destination="xwf-cz-MqX" id="Lbh-KL-POZ"/>
@@ -1571,7 +1571,7 @@ Password:</string>
     <inferredMetricsTieBreakers>
         <segue reference="U36-w4-JXO"/>
         <segue reference="9hK-yh-DLi"/>
-        <segue reference="ySV-kO-OLf"/>
-        <segue reference="7Gy-SA-HO6"/>
+        <segue reference="ifo-YE-z2c"/>
+        <segue reference="NND-lE-y8f"/>
     </inferredMetricsTieBreakers>
 </document>

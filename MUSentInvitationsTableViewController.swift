@@ -95,7 +95,7 @@ class MUSentInvitationsTableViewController: UITableViewController {
         if ((self.haveGotSentInvitationInfo != true))
         {
         
-            let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/getallsentinvitationinfo.php")! // the web link of the provider.
+            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getallsentinvitationinfo.php")! // the web link of the provider.
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
             
@@ -175,19 +175,19 @@ class MUSentInvitationsTableViewController: UITableViewController {
                             let haveSelectedMeetingTimeFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingTimeFlag"] as! Bool
                             let haveSelectedMeetingLocationFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingLocationFlag"] as! Bool
                             
-                            let selectedMeetingTime:String = ""
-                            
-        //                        if(haveSelectedMeetingTimeFlag)
-        //                        {
-        //                            let selectedMeetingTime:String = arraySentMeetingInfo[index]["selectedMeetingTime"] as! String
-        //                        }
+//                           let selectedMeetingTime:String = ""
+//                            
+//                                if(haveSelectedMeetingTimeFlag)
+//                                {
+                                    let selectedMeetingTime:String = arraySentMeetingInfo[index]["selectedMeetingTime"] as! String
+//                                }
               
-                            let selectedMeetingLocation:String = ""
-        //                        if(haveSelectedMeetingLocationFlag)
-        //                        {
-        //                            let selectedMeetingLocation:String = arraySentMeetingInfo[index]["selectedMeetingLocation"] as! String
-        //                        }
-        //     
+//                            let selectedMeetingLocation:String = ""
+//                                if(haveSelectedMeetingLocationFlag)
+//                                {
+                                    let selectedMeetingLocation:String = arraySentMeetingInfo[index]["selectedMeetingLocation"] as! String
+//                                }
+             
                             var oneRowInvitation: Invitation?
                             
                             oneRowInvitation = Invitation(InvitationId: invitationID,MeetingName: meetingName, MeetingDescription: meetingDescription, MeetingTime: meetingTime, MeetingLocation: meetingLocation, InvitedFriendEmail: invitedFriendEmail, InviterFriendEmail: inviterFriendEmail,selectedMeetingTime: selectedMeetingTime, selectedMeetingLocation: selectedMeetingLocation, haveSelectedMeetingTimeFlag:haveSelectedMeetingTimeFlag, haveSelectedMeetingLocationFlag:haveSelectedMeetingLocationFlag)

@@ -168,9 +168,9 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
         /* Send device token together with loginEmailand longinPassword to the provider through HTTP request message. */
         
         
-        let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/login.php")!
+        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/login.php")!
         
-        //let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/login.php")!  // the web link of the provider.
+        //let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/login.php")!  // the web link of the provider.
         
         let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
         
