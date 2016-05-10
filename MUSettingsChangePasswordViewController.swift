@@ -72,7 +72,7 @@ class MUSettingsChangePasswordViewController: UIViewController {
             {
 
                 let myEmail = appDelegate.accountInfo!.Email
-                let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/changepassword.php")!  // the web link of the provider.
+                let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/changepassword.php")!  // the web link of the provider.
                 let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
                 request.HTTPMethod = "POST";  //Post to PHP in provider.
                 

@@ -176,7 +176,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         NSLog("#########Received push notification 1 ==> Notify invited user about coming new invitation")
                         
                         /* Send Http message to supported web server in order to get the invitation information. */
-                        let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/getinvitationinfo.php")!  // the web link of the provider.
+                        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getinvitationinfo.php")!  // the web link of the provider.
                         let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
                         request.HTTPMethod = "POST";  //Post to PHP in provider.
                         
@@ -299,7 +299,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         NSLog("#########Received push notification 2 ==> Notify inviter user about selected time.")
                         
                         /* Send Http message to supported web server in order to get selected meeting time for the inviter user. */
-                        let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/getselectedmeetingtime.php")!  // the web link of the provider.
+                        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getselectedmeetingtime.php")!  // the web link of the provider.
                         let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
                         request.HTTPMethod = "POST";  //Post to PHP in provider.
                         
@@ -382,20 +382,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                     
                                                     sentInvitationsVC.Invitations[indexPath.row].MeetingTime.append(selectedMeetingTime)
                                                     
+                                                    sentInvitationsVC.Invitations[indexPath.row].selectedMeetingTime = selectedMeetingTime
+                                                    
                                                     
                                                         sentInvitationsVC.tableView(sentInvitationsVC.tableView, didSelectRowAtIndexPath: indexPath)
                                                     
                                                     sentInvitationsVC.performSegueWithIdentifier("SegueToDetailSentInvitationVC", sender: self)
                                                     
                             
-//                                                    let title = "Check selected meeting time!"
-//                                                    let message = "Meeting time has been selected by the invited user, please have a check!"
-//                                                    sendAlertView(title, message: message)
+                                                        let title = "Check selected meeting time!"
+                                                        let message = "Meeting time has been selected by the invited user, please have a check!"
+                                                        sendAlertView(title, message: message)
                                                     
                                                     
 //                   /*********************************************Begin :Test****************************/
 //                                                    
-//                                                    let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/remindinvitation.php")!  // the web link of the provider.
+//                                                    let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/remindinvitation.php")!  // the web link of the provider.
 //                                                    let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
 //                                                    request.HTTPMethod = "POST";  //Post to PHP in provider.
 //                                                    
@@ -559,7 +561,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         NSLog("#########Received push notification 3 ==> Notify inviter user about selected location.")
                         
                         /* Send Http message to supported web server in order to get selected meeting location for the inviter user. */
-                        let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/getselectedmeetinglocation.php")!  // the web link of the provider.
+                        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getselectedmeetinglocation.php")!  // the web link of the provider.
                         let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
                         request.HTTPMethod = "POST";  //Post to PHP in provider.
                         
@@ -646,6 +648,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                     
                                                     sentInvitationsVC.Invitations[indexPath.row].MeetingLocation.append(selectedMeetingLocation)
                                                     
+                                                    sentInvitationsVC.Invitations[indexPath.row].selectedMeetingLocation = selectedMeetingLocation
                                                     
                                                     sentInvitationsVC.tableView(sentInvitationsVC.tableView, didSelectRowAtIndexPath: indexPath)
                                                     
@@ -698,7 +701,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
                         NSLog("#########Received push notification 4 ==> Notify inviter user about meeting starting.")
                         
-                        dispatch_async(dispatch_get_main_queue(), {
+  //                      dispatch_async(dispatch_get_main_queue(), {
                             
                             let navigationVC: UINavigationController = self.tabBarController?.viewControllers![0] as! UINavigationController
                             
@@ -721,6 +724,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                     {
 
                                         sentInvitationsVC.tableView(sentInvitationsVC.tableView, didSelectRowAtIndexPath: indexPath)
+                                    sentInvitationsVC.performSegueWithIdentifier("SegueToDetailSentInvitationVC", sender: self)
                         
                                     }
                                     
@@ -729,7 +733,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             }
                             
                             
-                        })
+       //                 })
 
                         
                         
@@ -742,7 +746,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         NSLog("#########Received push notification 5 ==> Notify invited user about meeting starting.")
                         
                         
-                        dispatch_async(dispatch_get_main_queue(), {
+  //                      dispatch_async(dispatch_get_main_queue(), {
                             
                             let navigationVC: UINavigationController = self.tabBarController?.viewControllers![1] as! UINavigationController
                             
@@ -766,14 +770,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                         
                                         ReceivedInvitationsVC.tableView(ReceivedInvitationsVC.tableView, didSelectRowAtIndexPath: indexPath)
                                         
+                                    ReceivedInvitationsVC.performSegueWithIdentifier("SegueToDetailInvitationVC", sender: self)
+                                        
+
                                     }
-                                    
                                     
                                 }
                             }
                             
                             
-                        })
+         //               })
                         
                         break
                         

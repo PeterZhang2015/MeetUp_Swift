@@ -89,7 +89,7 @@ class MUCreateAnAccountViewController: UIViewController ,UITextFieldDelegate{
             //    let deviceToken = "1234"  //Just for debug.
                 
                 /* send sign up data to web server. */
-                let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/createaccount.php")!
+                let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/createaccount.php")!
      
                 
                 let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)

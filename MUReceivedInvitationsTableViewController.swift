@@ -17,8 +17,28 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
     
     @IBAction func cancelForDetailSentInvitationVC(segue:UIStoryboardSegue) {
         
-
+        let sourceVC:MUDetailSentInvitationViewController = segue.sourceViewController as! MUDetailSentInvitationViewController
         
+        let invitationNum = self.receivedInvitations.count
+        
+        for index in 0 ..< invitationNum
+        {
+            if (self.receivedInvitations[index].InvitationId == sourceVC.AnInvitation?.InvitationId)
+            {
+                if (sourceVC.HaveSelectedMeetingTime == 1)
+                {
+                    self.receivedInvitations[index].haveSelectedMeetingTimeFlag = true
+                }
+                if (sourceVC.HaveSelectedMeetingLocation == 1)
+                {
+                    self.receivedInvitations[index].haveSelectedMeetingLocationFlag = true
+                }
+                
+            
+            }
+            
+            
+        }
     }
     
     
@@ -54,7 +74,7 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
         if ((self.haveGotReceivedInvitationInfo != true))
         {
             
-            let url: NSURL = NSURL(string: "http://192.168.0.23.xip.io/~chongzhengzhang/php/getallreceivedinvitationinfo.php")! // the web link of the provider.
+            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getallreceivedinvitationinfo.php")! // the web link of the provider.
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
             
@@ -242,6 +262,16 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
             
             detailSentInvitationVC.AnInvitation = self.SelectRowInvitation
             detailSentInvitationVC.sourceVC = 1  // 0-Sent Invitation VC, 1-Received Invitation VC
+            
+            if (self.SelectRowInvitation?.haveSelectedMeetingLocationFlag == true)
+            {
+                detailSentInvitationVC.HaveSelectedMeetingLocation = 1
+            }
+            
+            if (self.SelectRowInvitation?.haveSelectedMeetingTimeFlag == true)
+            {
+                detailSentInvitationVC.HaveSelectedMeetingTime = 1
+            }
             
         }
         

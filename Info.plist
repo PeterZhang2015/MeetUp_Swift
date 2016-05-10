@@ -2,31 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>fb451058091760166</string>
-                <string>fbauth2</string>
-            </array>
-        </dict>
-    </array>
-    <key>FacebookAppID</key>
-    <string>451058091760166</string>
-    <key>FacebookDisplayName</key>
-    <string>MeetUp</string>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>fbapi</string>
-        <string>fb-messenger-api</string>
-        <string>fbauth2</string>
-        <string>fbshareextension</string>
-    </array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allowing to get location can get better experience from the application.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Allowing to get location can get better experience from the application.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -43,35 +18,60 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb451058091760166</string>
+				<string>fbauth2</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>1.6</string>
+	<key>FacebookAppID</key>
+	<string>451058091760166</string>
+	<key>FacebookDisplayName</key>
+	<string>MeetUp</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>192.168.0.23.xip.io</key>
+			<key>meetupappsupportedserver.com</key>
 			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-				<key>NSExceptionRequiresForwardSecrecy</key>
 				<true/>
 				<key>NSExceptionMinimumTLSVersion</key>
 				<string>TLSv1.2</string>
-				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
-				<false/>
-				<key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
+				<key>NSExceptionRequiresForwardSecrecy</key>
 				<true/>
-				<key>NSThirdPartyExceptionMinimumTLSVersion</key>
-				<string>TLSv1.2</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
 				<key>NSRequiresCertificateTransparency</key>
 				<false/>
+				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSThirdPartyExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+				<key>NSThirdPartyExceptionRequiresForwardSecrecy</key>
+				<true/>
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allowing to get location can get better experience from the application.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allowing to get location can get better experience from the application.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

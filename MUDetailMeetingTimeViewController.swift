@@ -21,7 +21,9 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
     
     var  meetingTimeArray = [String]()
     
-    var  selectedMeetingTimeArray = [String]()
+   // var  selectedMeetingTimeArray = [String]()
+    
+    var  selectedMeetingTime: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,13 +59,33 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
     }
     
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return meetingTimeArray.count
+        
+        if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
+        {
+            return 1
+            
+        }
+        else{
+            
+            return meetingTimeArray.count
+        }
+        
+        
     }
     
     
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
-        return meetingTimeArray[row]
+        if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
+        {
+            return selectedMeetingTime
+            
+        }
+        else{
+            
+            return meetingTimeArray[row]
+        }
+        
     }
     
 //    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView?) -> UIView {
