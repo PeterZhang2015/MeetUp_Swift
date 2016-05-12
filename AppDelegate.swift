@@ -9,6 +9,7 @@
 import UIKit
 import FBSDKCoreKit
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
@@ -171,7 +172,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     
                     switch eventType{
                         
-                    case 1:  // 1-------Notify invited user about coming new invitation.
+                    case GlobalConstants.kNewInvitationForInvitedUser:  // 1-------Notify invited user about coming new invitation.
                         
                         NSLog("#########Received push notification 1 ==> Notify invited user about coming new invitation")
                         
@@ -294,7 +295,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       
                         break
                         
-                    case 2: // received push notification for inviter user about the selected meeting time by the invited user.
+                    case GlobalConstants.kSelectedTimeForInviterUser: // received push notification for inviter user about the selected meeting time by the invited user.
 
                         NSLog("#########Received push notification 2 ==> Notify inviter user about selected time.")
                         
@@ -555,7 +556,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
                         break
                         
-                    case 3:
+                    case GlobalConstants.kSelectedLocationForInviterUser:
                         // received push notification for inviter user about the selected meeting location by the invited user.
                         
                         NSLog("#########Received push notification 3 ==> Notify inviter user about selected location.")
@@ -696,7 +697,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
                         break
                         
-                    case 4:
+                    case GlobalConstants.kMeetingRemindForInviterUser:
                         //4-------Notify inviter user about meeting starting. 
                         
                         NSLog("#########Received push notification 4 ==> Notify inviter user about meeting starting.")
@@ -739,7 +740,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                         
                         break
                         
-                    case 5:
+                    case GlobalConstants.kMeetingRemindForInviterUser:
                         
                         //5-------Notify invited user about meeting starting.
                         
