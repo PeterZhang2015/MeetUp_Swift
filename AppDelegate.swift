@@ -11,6 +11,8 @@ import FBSDKCoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+
+// Pull request test from github.
     
     var window: UIWindow?
     var bIsLogin: Bool?    // Define the bIsLogin in order to judge whether the user has logged in. If the user has not logged in, it should show MUMainViewController to the user, otherwise, it should show TabBarController to the user.
@@ -630,6 +632,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                         
                                        // let sentInvitationsVC: MUSentInvitationsTableViewController = navigationVC.topViewController as! MUSentInvitationsTableViewController
                                         
+                                        // pull request test for github.
                                         
                                         for section in 0..<sentInvitationsVC.tableView.numberOfSections {
                                             
