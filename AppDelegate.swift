@@ -630,6 +630,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                         
                                        // let sentInvitationsVC: MUSentInvitationsTableViewController = navigationVC.topViewController as! MUSentInvitationsTableViewController
                                         
+                                        // pull request test for github.
                                         
                                         for section in 0..<sentInvitationsVC.tableView.numberOfSections {
                                             
