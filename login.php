@@ -1,7 +1,14 @@
 <?php
-	include('dbconnect.php');
 
-	/*** for Sample 
+
+    $conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
+
+    if (!$conn)
+    {
+        die('Could not connect: ' . mysql_error());
+    }
+    
+    /*** for Sample 
 	$_POST["sEmail"] = "test@gmail.com"; 
 	$_POST["sPassword"] = "123";  
 	*/
@@ -38,9 +45,9 @@
 	
 	}
 	
-	$objQuery = mysql_query($strSQL);
-	$objResult = mysql_fetch_array($objQuery);
-	$intNumRows = mysql_num_rows($objQuery);
+	$objQuery = mysqli_query($conn, $strSQL);
+	$objResult = mysqli_fetch_array($objQuery);
+	$intNumRows = mysqli_num_rows($objQuery);
 	if($intNumRows==0)   // No record matched!
 	{
 		$arr["Success"] = "0";
@@ -63,7 +70,7 @@
 			AND Email = '".$strEmail."'
 			";
 			
-			$objQuery = mysql_query($strSQL);
+			$objQuery = mysqli_query($conn, $strSQL);
 			if(!$objQuery)   // Update error!
 			{
 				$arr["Success"] = "0";
@@ -113,6 +120,5 @@
 		 // Error Message
 	*/
 	
-	mysql_close($objConnect);
-	
+
 ?>

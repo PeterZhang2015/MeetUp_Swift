@@ -3,18 +3,23 @@
 
 
  <?php
-	include('dbconnect.php');
 
-	
-	
+	 /*** Connect to the server database. ***/
+	 $conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
+	 
+	 if (!$conn)
+	 {
+	 	die('Could not connect: ' . mysql_error());
+	 }
+		
 	/*** Select all meeting time from selectedinvitationtime ***/
 	$strSQL = "SELECT * FROM selectedinvitationtime WHERE 1";
 	
 
-	$objTimeQuery = mysql_query($strSQL) or die(mysql_error());
+	$objTimeQuery = mysqli_query($conn, $strSQL) or die(mysql_error());
 
 	
-	$intNumRows = mysql_num_rows($objTimeQuery);
+	$intNumRows = mysqli_num_rows($objTimeQuery);
 	
 	$arr = null;
 	
@@ -35,7 +40,7 @@
 		$remindTime = date('Y-m-d H:i:s', strtotime('+1 hour')); // Get one hour after current date and time.
 		
 
-		while($row = mysql_fetch_array($objTimeQuery))	
+		while($row = mysqli_fetch_array($objTimeQuery))	
 		{
 			$haveRemindedFlag = $row["HaveRemindedFlag"];
 			
@@ -62,8 +67,8 @@
 					
 				// Get meeting information from meeting time.
 				$strSQL = "SELECT MeetingName, MeetingDescription, InviterEmail, InvitedEmail FROM invitations WHERE InvitationID = '".$invitationID."' ";
-				$objQuery = mysql_query($strSQL);
-				$result = mysql_fetch_array($objQuery);
+				$objQuery = mysqli_query($conn, $strSQL);
+				$result = mysqli_fetch_array($objQuery);
 				
 				$strMeetingName = $result["MeetingName"];
 				$strMeetingDescription = $result["MeetingDescription"];
@@ -71,8 +76,8 @@
 				$strInvitedEmail = $result["InvitedEmail"];
 	
 				$strSQL = "SELECT SelectedInvitationLocation FROM selectedinvitationlocation WHERE InvitationID = '".$invitationID."' ";
-				$objQuery = mysql_query($strSQL);
-				$result = mysql_fetch_array($objQuery);
+				$objQuery = mysqli_query($conn, $strSQL);
+				$result = mysqli_fetch_array($objQuery);
 				
 				$srtSelectedMeetingLocation = $result["SelectedInvitationLocation"];
 			
@@ -108,8 +113,8 @@
 				$QueryDeviceTokenSQL = "SELECT DeviceToken FROM accountinfo WHERE 1
 				AND Email = '".$strInviterEmail."'
 				";
-				$objQuery = mysql_query($QueryDeviceTokenSQL);
-				$objResult = mysql_fetch_array($objQuery);
+				$objQuery = mysqli_query($conn, $QueryDeviceTokenSQL);
+				$objResult = mysqli_fetch_array($objQuery);
 				if(!$objResult)   // Email not exists
 				{
 			//		$arr["error_message"] = "strInviterEmail not exit.";
@@ -119,15 +124,19 @@
 				
 				$deviceToken = $objResult['DeviceToken'];
 				
-				
+
 				//Setup stream (connect to Apple Push Server)
-				$apnsHost = 'gateway.sandbox.push.apple.com';
+				//$apnsHost = 'gateway.sandbox.push.apple.com';
+				$apnsHost = 'gateway.push.apple.com';
+				
 				$apnsPort = 2195;
 				$passphrase = 'meetup123456789';
-				$apnsCert = 'apns_dev.pem';
+				//$apnsCert = 'apns_dev.pem';
+				$apnsCert = 'meetup_dis_pem.pem';
 				
 				$streamContext = stream_context_create();
 				
+				stream_context_set_option($streamContext, 'ssl', 'passphrase', $passphrase);
 				stream_context_set_option($streamContext, 'ssl', 'local_cert', $apnsCert);
 		
 				$fp = stream_socket_client('ssl://' . $apnsHost . ':' . $apnsPort, $error, $errorString, 2, STREAM_CLIENT_CONNECT, $streamContext);
@@ -170,8 +179,8 @@
 				$QueryDeviceTokenSQL = "SELECT DeviceToken FROM accountinfo WHERE 1
 				AND Email = '".$strInvitedEmail."'
 				";
-				$objQuery = mysql_query($QueryDeviceTokenSQL);
-				$objResult = mysql_fetch_array($objQuery);
+				$objQuery = mysqli_query($conn, $QueryDeviceTokenSQL);
+				$objResult = mysqli_fetch_array($objQuery);
 				if(!$objResult)   // Email not exists
 				{
 			//		$arr["error_message"] = "strInvitedEmail not exit.";
@@ -183,13 +192,16 @@
 				
 				
 				//Setup stream (connect to Apple Push Server)
-				$apnsHost = 'gateway.sandbox.push.apple.com';
+				//$apnsHost = 'gateway.sandbox.push.apple.com';
+				$apnsHost = 'gateway.push.apple.com';
 				$apnsPort = 2195;
 				$passphrase = 'meetup123456789';
-				$apnsCert = 'apns_dev.pem';
+				//$apnsCert = 'apns_dev.pem';
+				$apnsCert = 'meetup_dis_pem.pem';
 				
 				$streamContext = stream_context_create();
 				
+				stream_context_set_option($streamContext, 'ssl', 'passphrase', $passphrase);
 				stream_context_set_option($streamContext, 'ssl', 'local_cert', $apnsCert);
 				
 				$fp = stream_socket_client('ssl://' . $apnsHost . ':' . $apnsPort, $error, $errorString, 2, STREAM_CLIENT_CONNECT, $streamContext);
@@ -233,7 +245,7 @@
 				 AND InvitationID = '".$invitationID."'
 				 ";
 
-				 $objQuery = mysql_query($strSQL) or die(mysql_error());
+				 $objQuery = mysqli_query($conn, $strSQL) or die(mysql_error());
  
 		//		 $arr["error_message"] = "Update flag successfully";
 	

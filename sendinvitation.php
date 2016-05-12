@@ -3,7 +3,13 @@
 
 <?php
 
-	include('dbconnect.php');
+	/*** Connect to the server database. ***/
+	$conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
+	
+	if (!$conn)
+	{
+		die('Could not connect: ' . mysql_error());
+	}
 	
 	$strInviterEmail	= $_POST["sInviterEmail"];
     $strInvitedEmail	= $_POST["sInvitedEmail"];
@@ -35,10 +41,10 @@
 
     
     /*** Insert the information in the invitation table. ***/
-    $strSQL = "INSERT INTO `meetupdb`.`invitations` (`InviterEmail`, `InvitedEmail`, `MeetingName`, `MeetingDescription`)
+    $strSQL = "INSERT INTO `meetupap_meetupdb`.`invitations` (`InviterEmail`, `InvitedEmail`, `MeetingName`, `MeetingDescription`)
     VALUES ('$strInviterEmail', '$strInvitedEmail', '$strMeetingName', '$strMeetingDescription')";
     
-    $objQuery = mysql_query($strSQL);
+    $objQuery = mysqli_query($conn, $strSQL);
     
     if(!$objQuery) // Insert error.
     {
@@ -57,18 +63,18 @@
     else
     {
     
-	    $invitationID = mysql_insert_id();
+	    $invitationID = mysqli_insert_id($conn);
 	    
 	    $arr["InvitationID"] = $invitationID;
 	    
 	    /*** Insert the information in the invitationtimes table. ***/
 	    foreach($arrayMeetingTime as $value)
 	    {
-		    $strSQL = "INSERT INTO `meetupdb`.`invitationtimes` (`InvitationID`, `MeetingTime`)
+		    $strSQL = "INSERT INTO `meetupap_meetupdb`.`invitationtimes` (`InvitationID`, `MeetingTime`)
 		    VALUES ('$invitationID', '$value')"; 
 		    
 		    	
-		    $objQuery = mysql_query($strSQL);
+		    $objQuery = mysqli_query($conn, $strSQL);
 		    	
 		    if(!$objQuery) // Insert error.
 		    {
@@ -91,10 +97,10 @@
 	    foreach($arrayMeetingLocation as $value)
 		{
 			$arr["MeetingLocationLast"] = $value;
-			$strSQL = "INSERT INTO `meetupdb`.`invitationlocations` (`InvitationID`, `MeetingLocation`)
+			$strSQL = "INSERT INTO `meetupap_meetupdb`.`invitationlocations` (`InvitationID`, `MeetingLocation`)
 						VALUES ('$invitationID', '$value')";
 	     	
-			$objQuery = mysql_query($strSQL);
+			$objQuery = mysqli_query($conn, $strSQL);
 	     	
 			if(!$objQuery) // Insert error.
 			{
@@ -175,8 +181,8 @@
 		$QueryDeviceTokenSQL = "SELECT DeviceToken FROM accountinfo WHERE 1
 		AND Email = '".$strInvitedEmail."'
 		";
-		$objQuery = mysql_query($QueryDeviceTokenSQL);
-		$objResult = mysql_fetch_array($objQuery);
+		$objQuery = mysqli_query($conn, $QueryDeviceTokenSQL);
+		$objResult = mysqli_fetch_array($objQuery);
 		if(!$objResult)   // Email not exists
 		{
 			//$arr["Success"] = "0";   // (0=Failed , 1=Complete)
@@ -190,15 +196,18 @@
 		
 	
 		//Setup stream (connect to Apple Push Server)
-		$apnsHost = 'gateway.sandbox.push.apple.com';
+		//$apnsHost = 'gateway.sandbox.push.apple.com';
+		$apnsHost = 'gateway.push.apple.com';
 		$apnsPort = 2195;
 		$passphrase = 'meetup123456789';
-		$apnsCert = 'apns_dev.pem';
+		//$apnsCert = 'apns_dev.pem';
+		$apnsCert = 'meetup_dis_pem.pem';
+		
 		
 		$streamContext = stream_context_create();
 		
 	
-	//	stream_context_set_option($streamContext, 'ssl', 'passphrase', $passphrase);
+		stream_context_set_option($streamContext, 'ssl', 'passphrase', $passphrase);
 		stream_context_set_option($streamContext, 'ssl', 'local_cert', $apnsCert);
 		
 		//	stream_context_set_option($ctx, 'ssl', 'passphrase', 'apns_dev_key.pem');

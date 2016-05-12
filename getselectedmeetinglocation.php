@@ -3,9 +3,14 @@
 
 <?php
 
-	include('dbconnect.php');
+	/*** Connect to the server database. ***/
+	$conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
 	
-
+	if (!$conn)
+	{
+		die('Could not connect: ' . mysql_error());
+	}
+	
 	/*Get invitationID from POST message. */
 	$iInvitationID		= $_POST["iInvitationID"];
 	
@@ -16,9 +21,9 @@
     
     /*** Get the information in the selectedinvitationlocation table. ***/
 	$strSQL = "SELECT SelectedInvitationLocation FROM selectedinvitationlocation WHERE InvitationID = '".$iInvitationID."' ";
-	$objQuery = mysql_query($strSQL);
+	$objQuery = mysqli_query($conn, $strSQL);
 	//$objResult = mysql_fetch_array($objQuery, MYSQL_ASSOC);
-	$objResult = mysql_fetch_array($objQuery);
+	$objResult = mysqli_fetch_array($objQuery);
 	if(!$objResult)   // invitationID does not exist. 
 	{
 		$arr["Success"] = "0";   // (0=Failed , 1=Complete)
@@ -37,7 +42,7 @@
 	exit();
     
 
-    mysql_close($objConnect);
+    
     
  
     

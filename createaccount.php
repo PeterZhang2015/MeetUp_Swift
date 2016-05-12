@@ -3,8 +3,16 @@
 
 <?php
 
-	include('dbconnect.php');
+
+	/*** Connect to the server database. ***/
+	$conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
 	
+	if (!$conn)
+	{
+		die('Could not connect: ' . mysql_error());
+	}
+
+
 	/*** for Sample 
 		$_POST["sUsername"] = "test";
 		$_POST["sEmail"] = "test@gmail.com";
@@ -29,8 +37,8 @@
 
 	/*** Check Email Exists ***/
 	$strSQL = "SELECT * FROM accountinfo WHERE Email = '".$strEmail."' ";
-	$objQuery = mysql_query($strSQL);
-	$objResult = mysql_fetch_array($objQuery);
+	$objQuery = mysqli_query($conn, $strSQL);
+	$objResult = mysqli_fetch_array($objQuery);
 	if($objResult)   // Email Exists 
 	{
 		$arr["Success"] = "0";   // (0=Failed , 1=Complete)
@@ -41,11 +49,11 @@
 	}
 	
 	/*** Insert the information in the accountinfo table. ***/
-	$strSQL = "INSERT INTO `meetupdb`.`accountinfo` (`DeviceToken`, `UsernName`, `Email`, `Password`) 
+	$strSQL = "INSERT INTO `meetupap_meetupdb`.`accountinfo` (`DeviceToken`, `UsernName`, `Email`, `Password`) 
 	VALUES ('$strDeviceToken', '$strUsername', '$strEmail', '$strPassword')";
 	
 	
-	$objQuery = mysql_query($strSQL);
+	$objQuery = mysqli_query($conn, $strSQL);
 	if(!$objQuery) // Insert error.
 	{
 		$arr["Success"] = "0";  // (0=Failed , 1=Complete)
@@ -73,7 +81,4 @@
 		Message //  Message
 	*/	
 
-	
-	mysql_close($objConnect);
-	
 ?>

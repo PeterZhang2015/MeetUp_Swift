@@ -1,6 +1,13 @@
 <?php
-	include('dbconnect.php');
 
+
+	/*** Connect to the server database. ***/
+	$conn = mysqli_connect("localhost", "meetupap", "Hotmail28?", "meetupap_meetupdb");
+	
+	if (!$conn)
+	{
+		die('Could not connect: ' . mysql_error());
+	}
 	
 // 	class $aSentInvitationInfo{
 // 		public $id;
@@ -24,7 +31,7 @@
 	$strSQL = "SELECT * FROM invitations WHERE 1 
 		";
 
-	$objQuery = mysql_query($strSQL);
+	$objQuery = mysqli_query($conn, $strSQL);
 	if(!$objQuery) //  error.
 	{
 		$arr["Success"] = "0";  // (0=Failed , 1=Complete)
@@ -44,7 +51,7 @@
 	
 // 	$arr["row"] = $row;
 	
-	while($row = mysql_fetch_array($objQuery))
+	while($row = mysqli_fetch_array($objQuery))
 	{
 		
 		$rowInvitedEmail = $row["InvitedEmail"];
@@ -63,8 +70,8 @@
 			
 			//Get selected meeting time info
 			$strSQL = "SELECT * FROM selectedinvitationtime WHERE InvitationID = '".$invitationID."' ";
-			$objTimeQuery = mysql_query($strSQL);
-			$objResult = mysql_fetch_array($objTimeQuery);
+			$objTimeQuery = mysqli_query($conn, $strSQL);
+			$objResult = mysqli_fetch_array($objTimeQuery);
 			if ($objResult)
 			{
 				$srtSelectedMeetingTime = $objResult["SelectedMeetingTime"];
@@ -75,16 +82,16 @@
 				$haveSelectedMeetingTimeFlag = 0;
 			}
 				
-			if ($haveSelectedMeetingTimeFlag == 0)
-			{
+// 			if ($haveSelectedMeetingTimeFlag == 0)
+// 			{
 				
-				continue;
-			}
+// 				continue;
+// 			}
 				
 			//Get selected meeting location info
 			$strSQL = "SELECT SelectedInvitationLocation FROM selectedinvitationlocation WHERE InvitationID = '".$invitationID."' ";
-			$objLocationQuery = mysql_query($strSQL);
-			$objResult = mysql_fetch_array($objLocationQuery);
+			$objLocationQuery = mysqli_query($conn, $strSQL);
+			$objResult = mysqli_fetch_array($objLocationQuery);
 			if ($objResult)
 			{
 				$srtSelectedMeetingLocation = $objResult["SelectedInvitationLocation"];
@@ -96,18 +103,18 @@
 				$haveSelectedMeetingLocationFlag = 0;
 			}
 			
-			if ($haveSelectedMeetingLocationFlag == 0)
-			{
+// 			if ($haveSelectedMeetingLocationFlag == 0)
+// 			{
 			
-				continue;
-			}
+// 				continue;
+// 			}
 			
 			//Get all meeting time info
 			$strSQL = "SELECT * FROM invitationtimes WHERE InvitationID = '".$invitationID."' ";
-			$objAllTimeQuery = mysql_query($strSQL);
+			$objAllTimeQuery = mysqli_query($conn, $strSQL);
 			
 			$i = 0;
-			while($objResult = mysql_fetch_array($objAllTimeQuery))
+			while($objResult = mysqli_fetch_array($objAllTimeQuery))
 			{
 				$arrayAllTime[$i] = $objResult["MeetingTime"];
 				$i ++;
@@ -115,10 +122,10 @@
 			
 			//Get all meeting location info
 			$strSQL = "SELECT * FROM invitationlocations WHERE InvitationID = '".$invitationID."' ";
-			$objAllTimeQuery = mysql_query($strSQL);
+			$objAllTimeQuery = mysqli_query($conn, $strSQL);
 			
 			$i = 0;
-			while($objResult = mysql_fetch_array($objAllTimeQuery))
+			while($objResult = mysqli_fetch_array($objAllTimeQuery))
 			{
 				$arrayAllLocation[$i] = $objResult["MeetingLocation"];
 				$i ++;
@@ -167,7 +174,6 @@
 		 // MemberID
 		 // Error Message
 	*/
-	
-	mysql_close($objConnect);
+
 	
 ?>
