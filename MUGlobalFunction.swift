@@ -11,9 +11,8 @@ import UIKit
 
 
 
-
+/* Send Alert view to the user. */
 func sendAlertView(title: String, message: String) {
-
     
     dispatch_async(dispatch_get_main_queue(), {
         
@@ -28,9 +27,8 @@ func sendAlertView(title: String, message: String) {
 }
 
 
-
-func createHttpPostRequest(destinationUrl: NSURL, postString: String)-> NSMutableURLRequest {
-    
+/* Create Http request to the supported web server. */
+func createHttpPostRequest(destinationUrl: NSURL, postString: NSString)-> NSMutableURLRequest {
  
     let request:NSMutableURLRequest = NSMutableURLRequest(URL:destinationUrl)
     
@@ -52,33 +50,92 @@ func createHttpPostRequest(destinationUrl: NSURL, postString: String)-> NSMutabl
 }
 
 
-
-func sendHttpPost(request: NSMutableURLRequest, ProcessResponseFunc: (NSData) -> Void) {
+/* Send Http request to supported web server and process corressponding response for an invitation. */
+func interactionWithRemoteServerThroughHttpPost(invitationID: NSInteger, request: NSMutableURLRequest, processResponseFunc: (NSInteger, NSData, NSURLResponse) -> Void, failToGetHttpResponse: (NSInteger, NSString) -> Void) -> Void {
     
     
     let session = NSURLSession.sharedSession()
 
     let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
 
-        
-        if (data != nil)
+        if (error != nil)
         {
-            let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-            print("responseData: \(responseData)")
-            
-            let statusCode = (response as! NSHTTPURLResponse).statusCode
-            
-            NSLog("Response status code: %ld", statusCode);
-            
-            
-            ProcessResponseFunc(data!)
-            
+            print("error: \(error)")
+            failToGetHttpResponse(invitationID, error!.localizedDescription)
         }
-    
+        else
+        {
+            if ((data != nil) && (response != nil))
+            {
+
+                processResponseFunc(invitationID, data!, response!)
+                
+            }
+            else
+            {
+                let errorMsg = "Unknown error"
+                failToGetHttpResponse(invitationID, errorMsg)
+            }
+        }
     
         })
 
     task.resume()
+}
+
+
+/* Process the HTTP response according to the status code. */
+func processHttpResponseAccordingToStatusCode(invitationID: NSInteger, statusCode: Int, data: NSData, processSuccessfulHttpResponse: (invitationID: NSInteger, jsonData: NSDictionary) -> Void, processFailureHttpResponse: (invitationID: NSInteger, errorMsg: NSString) -> Void) -> Void {
+    
+    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
+    
+    if (statusCode >= 200 && statusCode < 300)
+    {
+        
+        let responseData:NSString  = NSString(data:data, encoding:NSUTF8StringEncoding)!
+        
+        NSLog("Response ==> %@", responseData);
+        
+        let success:NSString = jsonData.valueForKey("Success") as! NSString
+        
+        NSLog("Success ==> %@", success);
+        
+        if(success == "1")
+        {
+            /*Get required information Successfully. */
+            NSLog("Get required information Successfully. ");
+            
+            processSuccessfulHttpResponse(invitationID: invitationID, jsonData: jsonData)
+            
+        }
+        else
+        {
+            /*Fail to get required information. */
+            NSLog("Fail to get required information. ");
+            var error_msg:NSString
+            if jsonData["error_message"] as? NSString != nil {
+                error_msg = jsonData["error_message"] as! NSString
+            }
+            else {
+                
+                error_msg = "Unknown Error"
+                
+            }
+            
+            processFailureHttpResponse(invitationID: invitationID, errorMsg: error_msg)
+        }
+        
+    } // if (statusCode >= 200 && statusCode < 300)
+    else
+    {
+        /*Fail to get required information. */
+        NSLog("Fail to get required information. ");
+        
+        let error_msg = "Wrong status code"
+        
+        processFailureHttpResponse(invitationID: invitationID, errorMsg: error_msg)
+    }  // end of the else of if (statusCode >= 200 && statusCode < 300)
+
 }
 
 
