@@ -19,9 +19,7 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
     @IBOutlet var fbButtonInStoryboard: FBSDKLoginButton!
     
     let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-    let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-    
-    
+
     @IBAction func Login(sender: AnyObject) {
      
         if (LoginEmail.text!.isEmpty) { //Check whether the Email is empty
@@ -48,8 +46,8 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
         {
             /* Get stored device token. */
             let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-            let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-            let deviceToken = defaults.objectForKey(deviceTokenConstant) as! String?
+
+            let deviceToken = defaults.objectForKey(GlobalConstants.kdeviceToken) as! String?
             
             loginApplication(deviceToken, userEmail: (LoginEmail.text!), userPassword: (LoginPassword.text!), loginWithFacebook: 0)
             
@@ -141,8 +139,8 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
                         
                         /* Get stored device token. */
                         let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-                        let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-                        let deviceToken = defaults.objectForKey(deviceTokenConstant) as! String?
+
+                        let deviceToken = defaults.objectForKey(GlobalConstants.kdeviceToken) as! String?
                         
                         self.loginApplication(deviceToken, userEmail: userEmail as String, userPassword: "", loginWithFacebook: 1)
                

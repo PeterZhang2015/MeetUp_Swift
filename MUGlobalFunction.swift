@@ -50,8 +50,8 @@ func createHttpPostRequest(destinationUrl: NSURL, postString: NSString)-> NSMuta
 }
 
 
-/* Send Http request to supported web server and process corressponding response for an invitation. */
-func interactionWithRemoteServerThroughHttpPost(invitationID: NSInteger, request: NSMutableURLRequest, processResponseFunc: (NSInteger, NSData, NSURLResponse) -> Void, failToGetHttpResponse: (NSInteger, NSString) -> Void) -> Void {
+/* Send Http request to supported web server for the information of an invitation and process corressponding response for an invitation. */
+func interactionWithRemoteServerForAnInvitationThroughHttpPost(invitationID: NSInteger, request: NSMutableURLRequest, processResponseFunc: (NSInteger, NSData, NSURLResponse) -> Void, failToGetHttpResponse: (NSInteger, NSString) -> Void) -> Void {
     
     
     let session = NSURLSession.sharedSession()
@@ -83,8 +83,42 @@ func interactionWithRemoteServerThroughHttpPost(invitationID: NSInteger, request
     task.resume()
 }
 
+/* Send Http request to supported web server without invitation information and process corressponding response for an invitation. */
+func interactionWithRemoteServerWithoutInvitationThroughHttpPost(request: NSMutableURLRequest, processResponseFunc: (NSData, NSURLResponse) -> Void, failToGetHttpResponse: (NSString) -> Void) -> Void {
+    
+    
+    let session = NSURLSession.sharedSession()
+    
+    let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
+        
+        if (error != nil)
+        {
+            print("error: \(error)")
+            failToGetHttpResponse(error!.localizedDescription)
+        }
+        else
+        {
+            if ((data != nil) && (response != nil))
+            {
+                
+                processResponseFunc(data!, response!)
+                
+            }
+            else
+            {
+                let errorMsg = "Unknown error"
+                failToGetHttpResponse(errorMsg)
+            }
+        }
+        
+    })
+    
+    task.resume()
+}
 
-/* Process the HTTP response according to the status code. */
+
+
+/* Process the HTTP response for an invitation according to the status code. */
 func processHttpResponseAccordingToStatusCode(invitationID: NSInteger, statusCode: Int, data: NSData, processSuccessfulHttpResponse: (invitationID: NSInteger, jsonData: NSDictionary) -> Void, processFailureHttpResponse: (invitationID: NSInteger, errorMsg: NSString) -> Void) -> Void {
     
     let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
@@ -138,6 +172,63 @@ func processHttpResponseAccordingToStatusCode(invitationID: NSInteger, statusCod
 
 }
 
+
+/* Process the HTTP response without invitation according to the status code. */
+func processHttpResponseAccordingToStatusCode(statusCode: Int, data: NSData, processSuccessfulHttpResponse: (jsonData: NSDictionary) -> Void, processFailureHttpResponse: (errorMsg: NSString) -> Void) -> Void {
+    
+    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
+    
+    if (statusCode >= 200 && statusCode < 300)
+    {
+        
+        let responseData:NSString  = NSString(data:data, encoding:NSUTF8StringEncoding)!
+        
+        NSLog("Response ==> %@", responseData);
+        
+        let success:NSString = jsonData.valueForKey("Success") as! NSString
+        
+        NSLog("Success ==> %@", success);
+        
+        if(success == "1")
+        {
+            /*Get required information Successfully. */
+            NSLog("Get required information Successfully. ");
+            
+            processSuccessfulHttpResponse(jsonData: jsonData)
+            
+        }
+        else
+        {
+            /*Fail to get required information. */
+            NSLog("Fail to get required information. ");
+            var error_msg:NSString
+            if jsonData["error_message"] as? NSString != nil {
+                error_msg = jsonData["error_message"] as! NSString
+            }
+            else {
+                
+                error_msg = "Unknown Error"
+                
+            }
+            
+            processFailureHttpResponse(errorMsg: error_msg)
+        }
+        
+    } // if (statusCode >= 200 && statusCode < 300)
+    else
+    {
+        /*Fail to get required information. */
+        NSLog("Fail to get required information. ");
+        
+        let error_msg = "Wrong status code"
+        
+        processFailureHttpResponse(errorMsg: error_msg)
+    }  // end of the else of if (statusCode >= 200 && statusCode < 300)
+    
+}
+
+
+// end of MUGobalFunction.swift
 
 
 

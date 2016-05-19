@@ -22,9 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
     
-    let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
 
-    
     /*Handling when the application launched in didFinishLaunchingWithOptions function. */
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
@@ -62,7 +60,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         print(deviceTokenString )
         
-        defaults.setObject(deviceTokenString, forKey: deviceTokenConstant)  // Save the retrived device token, and send it to provider when login the application.
+        defaults.setObject(deviceTokenString, forKey: GlobalConstants.kdeviceToken)  // Save the retrived device token, and send it to provider when login the application.
         
  
         
@@ -287,7 +285,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let request = createHttpPostRequest(url, postString: postString)
 
-        interactionWithRemoteServerThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationInfoFromRemoteServer, failToGetHttpResponse: self.failedToGetTheInvitationInfo)
+        interactionWithRemoteServerForAnInvitationThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationInfoFromRemoteServer, failToGetHttpResponse: self.failedToGetTheInvitationInfo)
 
     }
     
@@ -429,7 +427,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         let request = createHttpPostRequest(url, postString: postString)
         
-        interactionWithRemoteServerThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationMeetingTimeFromRemoteServer, failToGetHttpResponse: self.failedToGetTheInvitationMeetingTime)
+        interactionWithRemoteServerForAnInvitationThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationMeetingTimeFromRemoteServer, failToGetHttpResponse: self.failedToGetTheInvitationMeetingTime)
             
     }
     
@@ -528,7 +526,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let request = createHttpPostRequest(url, postString: postString)
         
-        interactionWithRemoteServerThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationMeetingLocationFromRemoteServer, failToGetHttpResponse: failedToGetTheInvitationMeetingLocation)
+        interactionWithRemoteServerForAnInvitationThroughHttpPost(invitationID, request: request,  processResponseFunc: self.receivedInvitationMeetingLocationFromRemoteServer, failToGetHttpResponse: failedToGetTheInvitationMeetingLocation)
    
     }
     

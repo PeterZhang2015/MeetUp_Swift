@@ -23,6 +23,9 @@ struct GlobalConstants {
     
     static let kMeetingRemindForInvitedUser = 5
     
+    /* Device constant.  */
+    static let kdeviceToken = "deviceTokenKey"   //Set constant for getting device token.
+    
     
     
 
