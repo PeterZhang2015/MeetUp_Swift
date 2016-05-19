@@ -95,7 +95,7 @@ class MUSentInvitationsTableViewController: UITableViewController {
         if ((self.haveGotSentInvitationInfo != true))
         {
         
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getallsentinvitationinfo.php")! // the web link of the provider.
+            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getallsentinvitationinfo.php")! // the web link of the provider.
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
             

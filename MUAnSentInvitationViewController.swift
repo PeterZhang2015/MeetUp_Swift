@@ -153,7 +153,7 @@ class MUAnSentInvitationViewController: UIViewController ,UITextFieldDelegate, U
 
                 /* Send meeting invitation request to the provider through HTTP request message. */
                 
-                let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/sendinvitation.php")!  // the web link of the provider.
+                let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/sendinvitation.php")!  // the web link of the provider.
                 
                 let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
                 

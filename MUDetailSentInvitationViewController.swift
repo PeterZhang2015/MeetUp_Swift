@@ -76,7 +76,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             let selectedMeetingTime: String = delegate.pickerView!(sourceVC.meetingTimePicker, titleForRow: sourceVC.meetingTimePicker.selectedRowInComponent(0), forComponent: 0)!
             
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetingtime.php")!
+            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/selectedmeetingtime.php")!
             
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
@@ -211,7 +211,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetinglocation.php")!
+            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/selectedmeetinglocation.php")!
             
             
             let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)

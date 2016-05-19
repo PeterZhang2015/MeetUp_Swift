@@ -280,7 +280,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSLog("#########Received push notification 1 ==> Notify invited user about coming new invitation")
  
         /* Send Http message to supported web server in order to get the invitation information. */
-        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getinvitationinfo.php")!  // the web link of the provider.
+        let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getinvitationinfo.php")!  // the web link of the provider.
         
         // Compose request information.
         let postString: NSString = "iInvitationID=\(invitationID)"
@@ -423,7 +423,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSLog("#########Received push notification 2 ==> Notify inviter user about selected time.")
         
         /* Send Http message to supported web server in order to get selected meeting time for the inviter user. */
-        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getselectedmeetingtime.php")!  // the web link of the provider.
+        let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getselectedmeetingtime.php")!  // the web link of the provider.
         // Compose request information.
         let postString: NSString = "iInvitationID=\(invitationID)"
     
@@ -522,7 +522,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSLog("#########Received push notification 3 ==> Notify inviter user about selected location.")
         
         /* Send Http message to supported web server in order to get selected meeting location for the inviter user. */
-        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getselectedmeetinglocation.php")!  // the web link of the provider.
+        let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getselectedmeetinglocation.php")!  // the web link of the provider.
         // Compose request information.
         let postString: NSString = "iInvitationID=\(invitationID)"
         
