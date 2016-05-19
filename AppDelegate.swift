@@ -28,6 +28,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /*Handling when the application launched in didFinishLaunchingWithOptions function. */
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
+        // Set lauched view.
+       // self.window = UIWindow(frame:UIScreen.mainScreen().bounds)
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)  // Get the storyboard according to it's name.
+        
+        self.tabBarController = storyboard.instantiateViewControllerWithIdentifier("MainTabBarVC") as? UITabBarController // instantiate desired ViewController.
         
         if ((self.bIsLogin) != true){   // BOOL value to check if user is logged in or not.If user succefully logged in set value of this as true else false.
             

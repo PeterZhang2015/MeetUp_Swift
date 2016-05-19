@@ -27,56 +27,40 @@ class MUCreateAnAccountViewController: UIViewController ,UITextFieldDelegate{
         
         if (SignUpUserName.text!.isEmpty) { //Check whether the username is empty
             
-            let alert = UIAlertView()
-            alert.title = "No UserName"
-            alert.message = "You have to fill the UserName!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
+            let title = "No UserName"
+            let message = "You have to fill the UserName!"
+            sendAlertView(title, message: message)
             
         }
         else if (SignUpEmail.text!.isEmpty){ //Check whether the Email is empty
             
-            
-            let alert = UIAlertView()
-            alert.title = "No Email"
-            alert.message = "You have to fill the Email!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
+            let title = "No Email"
+            let message = "You have to fill the Email!"
+            sendAlertView(title, message: message)
             
             
         }
         else if (SignUpPassword.text!.isEmpty){ //Check whether the Email is empty
             
-            
-            let alert = UIAlertView()
-            alert.title = "No Password"
-            alert.message = "You have to fill the Password!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
-            
-            
+            let title = "No Password"
+            let message = "You have to fill the Password!"
+            sendAlertView(title, message: message)
+   
         }
         else if (SignUpConfirmPassword.text!.isEmpty){ //Check whether the Email is empty
             
-            
-            let alert = UIAlertView()
-            alert.title = "No Confirm Password"
-            alert.message = "You have to fill the Confirm Password!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
-            
+            let title = "No Confirm Password"
+            let message = "You have to fill the Confirm Password!"
+            sendAlertView(title, message: message)
             
         }
         else
         {
             if (SignUpPassword.text != SignUpConfirmPassword.text){  //Check whether the comfirm password is different from password. 
 
-                
-            let alert = UIAlertView()
-            alert.title = "Unmatched Password"
-            alert.message = "Confirm Password is different from Password!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
+                let title = "Unmatched Password"
+                let message = "Confirm Password is different from Password!"
+                sendAlertView(title, message: message)
                 
             }
             else
