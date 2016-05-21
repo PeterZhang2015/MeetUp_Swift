@@ -83,7 +83,7 @@ class MUCreateAnAccountViewController: UIViewController ,UITextFieldDelegate{
         NSLog("Fail to sign up");
         
         let title = "Sign Up Failed!"
-        let message = "Connection Failed"
+        let message = errorMsg as String
         sendAlertView(title, message: message)
         
     }
@@ -99,6 +99,7 @@ class MUCreateAnAccountViewController: UIViewController ,UITextFieldDelegate{
         
     }
     
+    /*Check the validation for the signup input information. */
     func checkValidationForSignUpInputInfo(username: UITextField, email: UITextField, password: UITextField, confirmedPassword: UITextField) -> Bool {
         
         if (username.text!.isEmpty) { //Check whether the username is empty
