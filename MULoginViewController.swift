@@ -12,9 +12,12 @@ import FBSDKLoginKit
 
 class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginButtonDelegate{
 
-    @IBOutlet weak var loginEmailText: UITextField!
-   
-    @IBOutlet weak var loginPasswordText: UITextField!
+    
+    
+    @IBOutlet var loginEmailText: UITextField!
+    
+    @IBOutlet var loginPasswordText: UITextField!
+    
     
     @IBOutlet var fbButtonInStoryboard: FBSDKLoginButton!
     
