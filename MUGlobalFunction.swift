@@ -227,6 +227,32 @@ func processHttpResponseAccordingToStatusCode(statusCode: Int, data: NSData, pro
     
 }
 
+/*  Decode arrayMeetingInfo in the JASON value from response of supported web server as an invitation information. */
+func decodeInvitationInfo(arryMeetingInfo: AnyObject) -> Invitation {
+    
+    var oneRowInvitation: Invitation?
+    
+    let invitationID:NSNumber = arryMeetingInfo["InvitationId"] as! NSNumber
+    let meetingName:String = arryMeetingInfo["MeetingName"] as! String
+    let meetingDescription:String = arryMeetingInfo["MeetingDescription"] as! String
+    let meetingTime:[String] = arryMeetingInfo["MeetingTime"] as! [String]
+    let meetingLocation:[String] = arryMeetingInfo["MeetingLocation"] as! [String]
+    let invitedFriendEmail:String = arryMeetingInfo["InvitedFriendEmail"] as! String
+    let inviterFriendEmail:String = arryMeetingInfo["InviterFriendEmail"] as! String
+    let haveSelectedMeetingTimeFlag:Bool = arryMeetingInfo["haveSelectedMeetingTimeFlag"] as! Bool
+    let haveSelectedMeetingLocationFlag:Bool = arryMeetingInfo["haveSelectedMeetingLocationFlag"] as! Bool
+    
+    
+    let selectedMeetingTime:String = arryMeetingInfo["selectedMeetingTime"] as! String
+    
+    let selectedMeetingLocation:String = arryMeetingInfo["selectedMeetingLocation"] as! String
+    
+    
+    oneRowInvitation = Invitation(InvitationId: invitationID,MeetingName: meetingName, MeetingDescription: meetingDescription, MeetingTime: meetingTime, MeetingLocation: meetingLocation, InvitedFriendEmail: invitedFriendEmail, InviterFriendEmail: inviterFriendEmail,selectedMeetingTime: selectedMeetingTime, selectedMeetingLocation: selectedMeetingLocation, haveSelectedMeetingTimeFlag:haveSelectedMeetingTimeFlag, haveSelectedMeetingLocationFlag:haveSelectedMeetingLocationFlag)
+    
+    return oneRowInvitation!
+}
+
 
 // end of MUGobalFunction.swift
 

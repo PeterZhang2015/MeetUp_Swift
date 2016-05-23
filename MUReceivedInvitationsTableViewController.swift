@@ -15,26 +15,34 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
     
     var haveGotReceivedInvitationInfo: Bool?
     
+    
     @IBAction func cancelForDetailSentInvitationVC(segue:UIStoryboardSegue) {
         
         let sourceVC:MUDetailSentInvitationViewController = segue.sourceViewController as! MUDetailSentInvitationViewController
-        
+
+        passFlagsFromSourceDetailInvitationToReceivedInvitationsTable(self.receivedInvitations, sourceVC:sourceVC)
+
+    }
+    
+    /* Passing flags about whether the user has selected meeting time or meeting location from source detail invitation to destination received invitations table. */
+    func passFlagsFromSourceDetailInvitationToReceivedInvitationsTable(receivedInvitations: [Invitation], sourceVC:MUDetailSentInvitationViewController) -> Void {
+
         let invitationNum = self.receivedInvitations.count
         
         for index in 0 ..< invitationNum
         {
-            if (self.receivedInvitations[index].InvitationId == sourceVC.AnInvitation?.InvitationId)
+            if (receivedInvitations[index].InvitationId == sourceVC.AnInvitation?.InvitationId)
             {
                 if (sourceVC.HaveSelectedMeetingTime == 1)
                 {
-                    self.receivedInvitations[index].haveSelectedMeetingTimeFlag = true
+                    receivedInvitations[index].haveSelectedMeetingTimeFlag = true
                 }
                 if (sourceVC.HaveSelectedMeetingLocation == 1)
                 {
-                    self.receivedInvitations[index].haveSelectedMeetingLocationFlag = true
+                    receivedInvitations[index].haveSelectedMeetingLocationFlag = true
                 }
                 
-            
+                
             }
             
             
@@ -61,6 +69,67 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
+    /*  Update received invitations table. */
+    func updateReceivedInvitationsTable(jsonData: NSDictionary) -> Void {
+        
+        let invitationNum = jsonData.valueForKey("invitationNum") as! Int
+        
+        let arraySentMeetingInfo = jsonData.valueForKey("arrayReceivedMeetingInfo") as! NSArray
+        
+        self.receivedInvitations.removeAll()
+        
+        for index in 0 ..< invitationNum
+        {
+            var oneRowInvitation: Invitation?
+            
+            oneRowInvitation = decodeInvitationInfo(arraySentMeetingInfo[index])
+            
+            self.receivedInvitations.append(oneRowInvitation!)
+            self.tableView.reloadData()
+            
+        }
+    }
+    
+    
+    /*  Succeed to get all received invitation information. */
+    func succeedToGetAllReceivedInvitationInfo(jsonData: NSDictionary) -> Void {
+        
+        updateReceivedInvitationsTable(jsonData)
+        
+        self.haveGotReceivedInvitationInfo = true
+        
+        // It is used to trigger cellForRowAtIndexPath for updating table data in time.
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            
+            self.tableView.reloadData()
+            
+        })
+        
+    }
+    
+    
+    /*  Failed to get all received invitation information. */
+    func failedToGetAllReceivedInvitationInfo(errorMsg: NSString) -> Void {
+        
+        NSLog("Fail to get all received invitation information.");
+        
+        let title = "Fail to get all received invitation information!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
+    
+    /* Process the http response from remote server after sending http request which asked for all received invitation information. */
+    func receivedAllReceivedInvitationInfoResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode);
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToGetAllReceivedInvitationInfo, processFailureHttpResponse: self.failedToGetAllReceivedInvitationInfo)
+        
+    }
+
+    
     override func viewWillAppear(animated: Bool) {
         //super.viewWillAppear(animated);
         
@@ -76,124 +145,16 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
             
             let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getallreceivedinvitationinfo.php")! // the web link of the provider.
             
-            let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
-            
-            request.HTTPMethod = "POST";  //Post to PHP in provider.
-            
-            
             /*Get AppDelegate. */
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            
-    
             // Compose login information with device token, login Email, and loginPassword
-            let postString: NSString = "sInvitedEmail=\(appDelegate.accountInfo!.Email)"
-            
+            let postString: NSString = "sInvitedEmail=\(appDelegate.accountInfo!.Email)"   
             NSLog("Input Email for querying sent invitation info ==> %@", appDelegate.accountInfo!.Email);
             
+            let request = createHttpPostRequest(url, postString: postString)
             
-            //Set the login information as the HTTP body
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-            
-            let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-            let postLength:NSString = String( postData.length )
-            request.addValue(postLength as String, forHTTPHeaderField: "Content-Length")
-            
-            request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-            
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
-            
-            
-            let session = NSURLSession.sharedSession()
-            
-            let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-                
-                print("error: \(error)")
-                
-                print("Response: \(response)")
-                let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-                print("Body: \(responseData)")
-                
-                
-                let statusCode = (response as! NSHTTPURLResponse).statusCode
-                
-                NSLog("Response code: %ld", statusCode);
-                
-                if (statusCode >= 200 && statusCode < 300)
-                {
-                    
-                    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                    
-                    
-                    let success:NSString = jsonData.valueForKey("Success") as! NSString
-                    
-                    NSLog("Success ==> %@", success);
-                    
-                    
-                    if(success == "1")
-                    {
+            interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: receivedAllReceivedInvitationInfoResultFromRemoteServer, failToGetHttpResponse: self.failedToGetAllReceivedInvitationInfo)
                         
-                        /*Show the successful login result. */
-                        NSLog("Get received invitation info Successfully!");
-                        
-                        let invitationNum = jsonData.valueForKey("invitationNum") as! Int
-                        
-
-                        let arraySentMeetingInfo = jsonData.valueForKey("arrayReceivedMeetingInfo") as! NSArray
-                        
-                        self.receivedInvitations.removeAll()
-                        
-                        for index in 0 ..< invitationNum
-                        {
-                            let invitationID:NSNumber = arraySentMeetingInfo[index]["InvitationId"] as! NSNumber
-                            let meetingName:String = arraySentMeetingInfo[index]["MeetingName"] as! String
-                            let meetingDescription:String = arraySentMeetingInfo[index]["MeetingDescription"] as! String
-                            let meetingTime:[String] = arraySentMeetingInfo[index]["MeetingTime"] as! [String]
-                            let meetingLocation:[String] = arraySentMeetingInfo[index]["MeetingLocation"] as! [String]
-                            let invitedFriendEmail:String = arraySentMeetingInfo[index]["InvitedFriendEmail"] as! String
-                            let inviterFriendEmail:String = arraySentMeetingInfo[index]["InviterFriendEmail"] as! String
-                            let haveSelectedMeetingTimeFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingTimeFlag"] as! Bool
-                            let haveSelectedMeetingLocationFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingLocationFlag"] as! Bool
-                            
-//                            let selectedMeetingTime:String = ""
-//                            let selectedMeetingLocation:String = ""
-                            
-      
-                            let selectedMeetingTime:String = arraySentMeetingInfo[index]["selectedMeetingTime"] as! String
-   
-                            let selectedMeetingLocation:String = arraySentMeetingInfo[index]["selectedMeetingLocation"] as! String
-                       
-    
-                            var oneRowInvitation: Invitation?
-                            
-                            oneRowInvitation = Invitation(InvitationId: invitationID,MeetingName: meetingName, MeetingDescription: meetingDescription, MeetingTime: meetingTime, MeetingLocation: meetingLocation, InvitedFriendEmail: invitedFriendEmail, InviterFriendEmail: inviterFriendEmail,selectedMeetingTime: selectedMeetingTime, selectedMeetingLocation: selectedMeetingLocation, haveSelectedMeetingTimeFlag:haveSelectedMeetingTimeFlag, haveSelectedMeetingLocationFlag:haveSelectedMeetingLocationFlag)
-                            
-                            self.receivedInvitations.append(oneRowInvitation!)
-                            self.tableView.reloadData()
-                            
-                        }
-                        
-                        self.haveGotReceivedInvitationInfo = true
-                        
-                        // It is used to trigger cellForRowAtIndexPath for updating table data in time.
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            
-                            self.tableView.reloadData()
-                            
-                        })
-                            
-               
-                        
-                        
-                    }  // end of if(success == "1")
-                    
-                }// end of if (statusCode >= 200 && statusCode < 300)
-                
-                
-            })
-            
-            task.resume()
         }
         
         

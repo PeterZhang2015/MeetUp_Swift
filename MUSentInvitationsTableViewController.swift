@@ -59,34 +59,8 @@ class MUSentInvitationsTableViewController: UITableViewController {
 
     }
     
-    /*  Decode arraySentMeetingInfo in the JASON value from response of supported web server as an invitation information. */
-    func decodeInvitationInfo(sentMeetingInfo: AnyObject) -> Invitation {
-        
-        var oneRowInvitation: Invitation?
-        
-        let invitationID:NSNumber = sentMeetingInfo["InvitationId"] as! NSNumber
-        let meetingName:String = sentMeetingInfo["MeetingName"] as! String
-        let meetingDescription:String = sentMeetingInfo["MeetingDescription"] as! String
-        let meetingTime:[String] = sentMeetingInfo["MeetingTime"] as! [String]
-        let meetingLocation:[String] = sentMeetingInfo["MeetingLocation"] as! [String]
-        let invitedFriendEmail:String = sentMeetingInfo["InvitedFriendEmail"] as! String
-        let inviterFriendEmail:String = sentMeetingInfo["InviterFriendEmail"] as! String
-        let haveSelectedMeetingTimeFlag:Bool = sentMeetingInfo["haveSelectedMeetingTimeFlag"] as! Bool
-        let haveSelectedMeetingLocationFlag:Bool = sentMeetingInfo["haveSelectedMeetingLocationFlag"] as! Bool
-        
-        
-        let selectedMeetingTime:String = sentMeetingInfo["selectedMeetingTime"] as! String
-        
-        let selectedMeetingLocation:String = sentMeetingInfo["selectedMeetingLocation"] as! String
-    
-        
-        oneRowInvitation = Invitation(InvitationId: invitationID,MeetingName: meetingName, MeetingDescription: meetingDescription, MeetingTime: meetingTime, MeetingLocation: meetingLocation, InvitedFriendEmail: invitedFriendEmail, InviterFriendEmail: inviterFriendEmail,selectedMeetingTime: selectedMeetingTime, selectedMeetingLocation: selectedMeetingLocation, haveSelectedMeetingTimeFlag:haveSelectedMeetingTimeFlag, haveSelectedMeetingLocationFlag:haveSelectedMeetingLocationFlag)
-        
-        return oneRowInvitation!
-    }
-    
-    /*  Update invitations table. */
-    func updateInvitationsTable(jsonData: NSDictionary) -> Void {
+    /*  Update Sent invitations table. */
+    func updateSentInvitationsTable(jsonData: NSDictionary) -> Void {
         
         let invitationNum = jsonData.valueForKey("invitationNum") as! Int
         
@@ -109,7 +83,7 @@ class MUSentInvitationsTableViewController: UITableViewController {
     /*  Succeed to get all sent invitation information. */
     func succeedToGetAllSentInvitationInfo(jsonData: NSDictionary) -> Void {
         
-        updateInvitationsTable(jsonData)
+        updateSentInvitationsTable(jsonData)
         
         self.haveGotSentInvitationInfo = true
         
