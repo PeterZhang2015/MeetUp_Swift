@@ -205,7 +205,7 @@ class MUAnSentInvitationViewController: UIViewController ,UITextFieldDelegate, U
     
     
     /* Process the http response from remote server after sending http request which sending added invitation information to supported web server. */
-    func receivedAllSentInvitationInfoResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+    func receivedSendingTheInvitationResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
         
         let statusCode = (response as! NSHTTPURLResponse).statusCode
         NSLog("Response code: %ld", statusCode);
@@ -234,7 +234,7 @@ class MUAnSentInvitationViewController: UIViewController ,UITextFieldDelegate, U
                 
                 let request = createHttpPostRequest(url, postString: postString)
                 
-                interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedAllSentInvitationInfoResultFromRemoteServer, failToGetHttpResponse: self.failedToSendTheInvitationInfo)
+                interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedSendingTheInvitationResultFromRemoteServer, failToGetHttpResponse: self.failedToSendTheInvitationInfo)
                 
                 
             }       // end of if (addedInvitationValid)
