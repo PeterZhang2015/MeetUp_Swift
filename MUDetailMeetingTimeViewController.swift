@@ -11,8 +11,6 @@ import UIKit
 class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate {
 
 
-
-
     @IBOutlet weak var meetingTimePicker: UIPickerView!
     
     var sourceVC: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
@@ -20,8 +18,6 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
     var HaveSelected: Int? //    0-not selected, 1-selected
     
     var  meetingTimeArray = [String]()
-    
-   // var  selectedMeetingTimeArray = [String]()
     
     var  selectedMeetingTime: String?
     
@@ -32,8 +28,6 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
    
         if ((self.sourceVC != 1) || (self.HaveSelected == 1))  // Need to hide the "Select" right bar button Item.
         {
-            // let oldRightButtom: UIBarButtonItem = (self.navigationController?.navigationItem.rightBarButtonItem)!
-            
             self.navigationController?.navigationItem.rightBarButtonItem = nil
             
             self.navigationItem.rightBarButtonItems = nil

@@ -90,9 +90,7 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
     
     
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        
-        
-        
+
         if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
         {
             return selectedMeetingLocation
@@ -113,9 +111,6 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
             let destinationNavigationController:UINavigationController = segue.destinationViewController as! UINavigationController
             
             let getToMeetingLocationVC:MUGetToMeetingLocationViewController = destinationNavigationController.topViewController as! MUGetToMeetingLocationViewController
-            
-       //     let getToMeetingLocationVC:MUGetToMeetingLocationViewController = segue.destinationViewController as!MUGetToMeetingLocationViewController
-            
             
             getToMeetingLocationVC.selectedMeetingLocationAddress = selectedMeetingLocation
     
