@@ -12,7 +12,7 @@ class MUDetailSentInvitationViewController: UIViewController {
     
     var AnInvitation: Invitation?
     
-   // var sourceVC: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
+    var sourceVcType: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
     
     var selectedMeetingTime: String!
     var selectedMeetingLocation: String!
@@ -222,7 +222,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             detailMeetingTimeVC.meetingTimeArray = AnInvitation!.MeetingTime
 
-          //  detailMeetingTimeVC.sourceVC = self.sourceVC
+            detailMeetingTimeVC.sourceVcType = self.sourceVcType
             detailMeetingTimeVC.HaveSelected = self.HaveSelectedMeetingTime
             detailMeetingTimeVC.selectedMeetingTime = AnInvitation?.selectedMeetingTime
             
@@ -239,7 +239,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             detailMeetingLocationVC.meetingLocationArray = AnInvitation!.MeetingLocation
             
-        //    detailMeetingLocationVC.sourceVC = self.sourceVC
+            detailMeetingLocationVC.sourceVcType = self.sourceVcType
             detailMeetingLocationVC.HaveSelected = self.HaveSelectedMeetingLocation
             
             detailMeetingLocationVC.selectedMeetingLocation = self.AnInvitation?.selectedMeetingLocation

@@ -71,7 +71,7 @@ class MUGetToMeetingLocationViewController: UIViewController, CLLocationManagerD
         
         let showAddressResult = showDestinationLocationAddressInTheMapView(self.MapView, destinationLocationAddress: self.selectedMeetingLocationAddress!, destinationTitle: destinationTitle)
         
-        if (showAddressResult.findCoordinate)
+        if (showAddressResult.findCoordinateFlag)
         {
             showRouteFromCurrentLocationToDestinationLocation(self.MapView, currentUserAddressCoordinate: self.currentUserAddressCoordinate, destinationLocationCoordinate: showAddressResult.destinationCoordinate)
         }

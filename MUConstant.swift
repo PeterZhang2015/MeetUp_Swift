@@ -27,7 +27,9 @@ struct GlobalConstants {
     static let kdeviceToken = "deviceTokenKey"   //Set constant for getting device token.
     
     
-    
+    /* ViewController Type.  */
+    static let kSentInvitationVC = 0 //    0-Sent Invitation VC, 1-Received Invitation VC
+    static let kReceivedInvitationVC = 1
 
     
 }

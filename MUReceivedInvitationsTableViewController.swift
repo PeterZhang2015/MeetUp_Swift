@@ -222,7 +222,7 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
             let detailSentInvitationVC:MUDetailSentInvitationViewController = segue.destinationViewController as!MUDetailSentInvitationViewController
             
             detailSentInvitationVC.AnInvitation = self.SelectRowInvitation
-            detailSentInvitationVC.sourceVC = 1  // 0-Sent Invitation VC, 1-Received Invitation VC
+            detailSentInvitationVC.sourceVcType = GlobalConstants.kReceivedInvitationVC  // 0-Sent Invitation VC, 1-Received Invitation VC
             
             if (self.SelectRowInvitation?.haveSelectedMeetingLocationFlag == true)
             {

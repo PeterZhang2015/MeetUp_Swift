@@ -370,7 +370,7 @@ func showDestinationLocationCoordinateInTheMapView(mapView: MKMapView, destinati
 
 
 /*Show destination location address in the map view. */
-func showDestinationLocationAddressInTheMapView(mapView: MKMapView, destinationLocationAddress: String, destinationTitle: String) ->  (findCoordinate: Bool, destinationCoordinate: CLLocationCoordinate2D) {
+func showDestinationLocationAddressInTheMapView(mapView: MKMapView, destinationLocationAddress: String, destinationTitle: String) ->  (findCoordinateFlag: Bool, destinationCoordinate: CLLocationCoordinate2D) {
     
     var findCoordinate = false
     

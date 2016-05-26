@@ -13,7 +13,7 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
 
     @IBOutlet weak var meetingTimePicker: UIPickerView!
     
-    var sourceVC: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
+    var sourceVcType: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
     
     var HaveSelected: Int? //    0-not selected, 1-selected
     
@@ -26,7 +26,7 @@ class MUDetailMeetingTimeViewController: UIViewController, UIPickerViewDelegate 
         
         meetingTimePicker.delegate = self
    
-        if ((self.sourceVC != 1) || (self.HaveSelected == 1))  // Need to hide the "Select" right bar button Item.
+        if ((self.sourceVcType != GlobalConstants.kReceivedInvitationVC) || (self.HaveSelected == 1))  // Need to hide the "Select" right bar button Item.
         {
             self.navigationController?.navigationItem.rightBarButtonItem = nil
             
