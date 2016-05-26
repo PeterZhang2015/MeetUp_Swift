@@ -37,8 +37,7 @@ class MUCreateAnAccountViewController: UIViewController ,UITextFieldDelegate{
             let postString: NSString = "sDeviceToken=\(deviceToken!)&sUsername=\(SignUpUserName.text!)&sEmail=\(SignUpEmail.text!)&sPassword=\(SignUpPassword.text!)"
             
             let request = createHttpPostRequest(url, postString: postString)
-            
-            
+
             interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedSignUpResultFromRemoteServer, failToGetHttpResponse: self.failedToSignUp)
         }
 
