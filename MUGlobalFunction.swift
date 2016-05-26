@@ -417,6 +417,16 @@ func showDestinationLocationAddressInTheMapView(mapView: MKMapView, destinationL
 }
 
 
+/*Adde action for UIAlertController. */
+func addActionForUIAlertController(alertController: UIAlertController ,actionTitle: String, actionProcess:(Void) -> Void) -> Void {
+    
+    alertController.addAction(UIAlertAction(title: actionTitle, style: .Default, handler: { (action: UIAlertAction!) in
+        
+        actionProcess()
+        
+    }))
+}
+
 
 
 

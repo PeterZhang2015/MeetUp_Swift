@@ -22,10 +22,6 @@ class MUSettingsTableViewController: UITableViewController ,FBSDKLoginButtonDele
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
-        
-        
-        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -62,7 +58,6 @@ class MUSettingsTableViewController: UITableViewController ,FBSDKLoginButtonDele
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
 
-  
         if indexPath.section == 0 {
             
             /* Get the EmailCell according to it's identifier. */
@@ -173,88 +168,82 @@ class MUSettingsTableViewController: UITableViewController ,FBSDKLoginButtonDele
     }
     
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    /*Initialize storyboard. */
+    func initializeTabBar() -> Void {
         
-        if indexPath.section == 2
-        {
-            
-
-            
-          //  let refreshAlert = UIAlertController(title: "Refresh", message: "All data will be lost.", preferredStyle: UIAlertControllerStyle.Alert)
-  
-            let LogOutAlert = UIAlertController(title: "Log Out", message: "Log out will not delete any data. You can still log in with this account.", preferredStyle: UIAlertControllerStyle.ActionSheet)
-         
-            
-            LogOutAlert.addAction(UIAlertAction(title: "Log Out", style: .Default, handler: { (action: UIAlertAction!) in
-    
-     
-                /*Get AppDelegate. */
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            
-  
-                let storyboard = UIStoryboard(name: "Main", bundle: nil)  // Get the storyboard according to it's name.
-
-      
-                let navigationVC: UINavigationController = self.tabBarController?.viewControllers![0] as! UINavigationController
-                
-                /***It is used to adjust first row of table viewcontroller under the navigation item. otherwise, the first row will moves up and hides under the nav-bar.****/
-                navigationVC.navigationBar.translucent = false
-                /***reference: https://github.com/samvermette/SVPullToRefresh/issues/181***/
-                
-                let sentInvitationsVC: MUSentInvitationsTableViewController = navigationVC.viewControllers[0] as! MUSentInvitationsTableViewController
-                
-                sentInvitationsVC.Invitations.removeAll()
-                sentInvitationsVC.haveGotSentInvitationInfo = false
-                
-                let ReceivedInvitationnavigationVC: UINavigationController = self.tabBarController?.viewControllers![1] as! UINavigationController
-                
-                /***It is used to adjust first row of table viewcontroller under the navigation item. otherwise, the first row will moves up and hides under the nav-bar.****/
-                ReceivedInvitationnavigationVC.navigationBar.translucent = false
-                /***reference: https://github.com/samvermette/SVPullToRefresh/issues/181***/
-                
-                let receivedInvitationsVC: MUReceivedInvitationsTableViewController = ReceivedInvitationnavigationVC.viewControllers[0] as! MUReceivedInvitationsTableViewController
-                
-                receivedInvitationsVC.receivedInvitations.removeAll()
-                receivedInvitationsVC.haveGotReceivedInvitationInfo = false
-  
-                
-                dispatch_async(dispatch_get_main_queue(), {
-                    
-                    
-                    
-                    let loginManager = FBSDKLoginManager()
-                    loginManager.logOut() // this is an instance function
-                    
-                    
-                    let LaunchViewController = storyboard.instantiateViewControllerWithIdentifier("LaunchVC") as! MULaunchViewController   // Get the MULaunchViewController according to it's storyboard identifier.
-                    
-                    
-                    //  appDelegate.window?.makeKeyAndVisible()
-                    appDelegate.window?.rootViewController = LaunchViewController
-                    
-                })
-//
-                
-            }))
-            
-            LogOutAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (action: UIAlertAction!) in
-       
-            }))
-            
-            presentViewController(LogOutAlert, animated: true, completion: nil)
-  
-            
-        }
+        let navigationVC: UINavigationController = self.tabBarController?.viewControllers![0] as! UINavigationController
+        /***It is used to adjust first row of table viewcontroller under the navigation item. otherwise, the first row will moves up and hides under the nav-bar.****/
+        navigationVC.navigationBar.translucent = false
+        /***reference: https://github.com/samvermette/SVPullToRefresh/issues/181***/
         
+        let sentInvitationsVC: MUSentInvitationsTableViewController = navigationVC.viewControllers[0] as! MUSentInvitationsTableViewController
+        sentInvitationsVC.Invitations.removeAll()
+        sentInvitationsVC.haveGotSentInvitationInfo = false
         
-
-       // performSegueWithIdentifier("SegueToLogin", sender: self)
+        let ReceivedInvitationnavigationVC: UINavigationController = self.tabBarController?.viewControllers![1] as! UINavigationController
+        /***It is used to adjust first row of table viewcontroller under the navigation item. otherwise, the first row will moves up and hides under the nav-bar.****/
+        ReceivedInvitationnavigationVC.navigationBar.translucent = false
+        /***reference: https://github.com/samvermette/SVPullToRefresh/issues/181***/
         
+        let receivedInvitationsVC: MUReceivedInvitationsTableViewController = ReceivedInvitationnavigationVC.viewControllers[0] as! MUReceivedInvitationsTableViewController
+        receivedInvitationsVC.receivedInvitations.removeAll()
+        receivedInvitationsVC.haveGotReceivedInvitationInfo = false
     }
     
     
     
+    /*Process LogOut action in alert controller. */
+    func processLogOutActionInAlertController() -> Void {
     
+        initializeTabBar()
+
+        dispatch_async(dispatch_get_main_queue(), {
+   
+            let loginManager = FBSDKLoginManager()
+            loginManager.logOut() // this is an instance function
+            
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)  // Get the storyboard according to it's name.
+            let LaunchViewController = storyboard.instantiateViewControllerWithIdentifier("LaunchVC") as! MULaunchViewController   // Get the MULaunchViewController according to it's storyboard identifier.
+            
+            /*Get AppDelegate. */
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            //  appDelegate.window?.makeKeyAndVisible()
+            appDelegate.window?.rootViewController = LaunchViewController
+            
+        })
+
+    }
+    
+    /*Process Cancel action in alert controller. */
+    func processCancelActionInAlertController() -> Void {
+        
+    }
+    
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        if (indexPath.section == 2)
+        {
+            
+            //  let refreshAlert = UIAlertController(title: "Refresh", message: "All data will be lost.", preferredStyle: UIAlertControllerStyle.Alert)
+  
+            let LogOutAlert = UIAlertController(title: "Log Out", message: "Log out will not delete any data. You can still log in with this account.", preferredStyle: UIAlertControllerStyle.ActionSheet)
+         
+            addActionForUIAlertController(LogOutAlert, actionTitle: "Log Out", actionProcess: processLogOutActionInAlertController)
+                
+
+            addActionForUIAlertController(LogOutAlert, actionTitle: "Cancel", actionProcess: processCancelActionInAlertController)
+            
+            
+            presentViewController(LogOutAlert, animated: true, completion: nil)
+  
+            
+        }  // end of if (indexPath.section == 2)
+ 
+       // performSegueWithIdentifier("SegueToLogin", sender: self)
+        
+    }
+
     
     func loginButton(loginButton: FBSDKLoginButton!, didCompleteWithResult result: FBSDKLoginManagerLoginResult!, error: NSError!) {
         
