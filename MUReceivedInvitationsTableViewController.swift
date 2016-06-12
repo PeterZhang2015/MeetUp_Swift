@@ -143,7 +143,7 @@ class MUReceivedInvitationsTableViewController: UITableViewController {
         if ((self.haveGotReceivedInvitationInfo != true))
         {
             
-            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/getallreceivedinvitationinfo.php")! // the web link of the provider.
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/getallreceivedinvitationinfo.php")! // the web link of the provider.
             
             /*Get AppDelegate. */
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate

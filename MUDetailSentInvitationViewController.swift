@@ -109,7 +109,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             
             /*Sending the added invitation to the supported web server. */
-            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/selectedmeetingtime.php")!
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/selectedmeetingtime.php")!
             
             let postString: NSString = "sSelectedMeetingTime=\(selectedMeetingTime)&iInvitationID=\(AnInvitation!.InvitationId)"
             
@@ -187,7 +187,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             AnInvitation?.selectedMeetingLocation = selectedMeetingLocation
             
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://192.168.0.20.xip.io/~chongzhengzhang/php/selectedmeetinglocation.php")!
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/selectedmeetinglocation.php")!
 
             // Compose a query string
             let postString: NSString = "sSelectedMeetingLocation=\(selectedMeetingLocation)&iInvitationID=\(AnInvitation!.InvitationId)"
