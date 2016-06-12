@@ -18,150 +18,119 @@ class MUSettingsChangePasswordViewController: UIViewController {
         
     }
     
+    
+    /*Check the validation for the change password information. */
+    func checkValidationForSignUpInputInfo(currentPassword: UITextField, newPassword: UITextField, newPasswordAgain: UITextField) -> Bool {
+        
+        if (currentPassword.text!.isEmpty) { //Check whether the Current Password is empty
+            
+            let title = "No Current Password"
+            let message = "You have to fill the Current Password!"
+            sendAlertView(title, message: message)
+            return false
+        }
+            
+        if (newPassword.text!.isEmpty){ //Check whether the new password is empty
+            
+            let title = "No New Password"
+            let message = "You have to fill the New Password!"
+            sendAlertView(title, message: message)
+            return false
+        }
+            
+        if (newPasswordAgain.text!.isEmpty){ //Check whether the new password again is empty
+            
+            let title = "No New Password Again"
+            let message = "You have to fill the New Password Again!"
+            sendAlertView(title, message: message)
+            return false
+        }
+            
+        if (newPassword.text != newPasswordAgain.text){ //Check whether the new password again is the same as the new password
+            
+            let title = "Different New Password"
+            let message = "New Password Again must be the same as the New Password!"
+            sendAlertView(title, message: message)
+            return false
+        }
+        
+        return true
+        
+    }
+    
+    
+    /*  Succeed to change password for the user account. */
+    func succeedToChangePassword(jsonData: NSDictionary) -> Void {
+        
+        /*Show the successful result. */
+        NSLog("Change Password Successfully");
+        
+        let title = "Successed to change passsword!!"
+        let message = "Change Passsword Successfully!"
+        sendAlertView(title, message: message)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            
+            /*Get AppDelegate. */
+            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+            
+            /*Set the current view controller as the main tab bar of the application. */
+            appDelegate.window?.rootViewController = appDelegate.tabBarController
+            //self.dismissViewControllerAnimated(true, completion: nil)
+        })  // end of dispatch_async(dispatch_get_main_queue()
+        
+    }
+    
+    /*  Failed to change password for the user account. */
+    func failedToChangePassword(errorMsg: NSString) -> Void {
+        
+        NSLog("Failed To Change Passsword!");
+        
+        let title = "Failed To Change Passsword!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
+    
+    /* Process the http response from remote server after sending http request which asked for changing password. */
+    func receivedChangingPasswordResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode);
+        
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToChangePassword, processFailureHttpResponse: self.failedToChangePassword)
+        
+        
+    }
+    
     /* Override shouldPerformSegueWithIdentifier in order to check validation.  */
     override func shouldPerformSegueWithIdentifier(identifier: String, sender: AnyObject!) -> Bool {
         
         /* Check the validation of meeting name. */
         if identifier == "SegueFromChangePasswordVC" {
-            
-            /*Get AppDelegate. */
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            
-            
-            if (currentPassword.text!.isEmpty) { //Check whether the Current Password is empty
-                let alert = UIAlertView()
-                alert.title = "No Current Password"
-                alert.message = "You have to fill the Current Password!"
-                alert.addButtonWithTitle("OK")
-                alert.show()
 
-     
-            }
-                
-            else if (newPassword.text!.isEmpty){ //Check whether the new password is empty
-
-                let alert = UIAlertView()
-                alert.title = "No New Password"
-                alert.message = "You have to fill the New Password!"
-                alert.addButtonWithTitle("OK")
-                alert.show()
-                
-            }
-                    
-            else if (newPasswordAgain.text!.isEmpty){ //Check whether the new password again is empty
-    
-                let alert = UIAlertView()
-                alert.title = "No New Password Again"
-                alert.message = "You have to fill the New Password Again!"
-                alert.addButtonWithTitle("OK")
-                alert.show()
-    
-            }
-                    
-            else if (newPassword.text != newPasswordAgain.text){ //Check whether the new password again is the same as the new password
-    
-                let alert = UIAlertView()
-                alert.title = "Different New Password"
-                alert.message = "New Password Again must be the same as the New Password!"
-                alert.addButtonWithTitle("OK")
-                alert.show()
- 
-            }
-                    
-            else
+            let changePasswordInfoValid = checkValidationForSignUpInputInfo(currentPassword, newPassword: newPassword, newPasswordAgain: newPasswordAgain)
+            
+            if (changePasswordInfoValid)
             {
-
+                let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/changepassword.php")!  // the web link of the provider.
+   
+                /*Get AppDelegate. */
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
                 let myEmail = appDelegate.accountInfo!.Email
-                let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/changepassword.php")!  // the web link of the provider.
-                let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
-                request.HTTPMethod = "POST";  //Post to PHP in provider.
-                
                 // Compose change password information with user email, current password, and new password.
                 let postString: NSString = "sEmail=\(myEmail)&sCurrentPassword=\(currentPassword.text!)&sNewPassword=\(newPassword.text!)"
                 
-                //Set the change password information as the HTTP body
-                request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-                let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-                let postLength:NSString = String( postData.length )
-                request.setValue(postLength as String, forHTTPHeaderField: "Content-Length")
-                request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-                request.setValue("application/json", forHTTPHeaderField: "Accept")
+                let request = createHttpPostRequest(url, postString: postString)
                 
-                
-                let session = NSURLSession.sharedSession()
-                
-                let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-                    
-                    
-                    print("Response: \(response)")
-                    let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-                    print("Body: \(responseData)")
-                    
-                    print("error: \(error)")
-                    
-                    let statusCode = (response as! NSHTTPURLResponse).statusCode
-                    
-                    NSLog("Response code: %ld", statusCode);
-                
-                    
-                    if (statusCode >= 200 && statusCode < 300)
-                    {
-                        
-                        let responseData:NSString  = NSString(data:data!, encoding:NSUTF8StringEncoding)!
-                        
-                        NSLog("Response ==> %@", responseData);
-                        
-                        let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                        
-                        let success:NSString = jsonData.valueForKey("Success") as! NSString
-                        
-                        NSLog("Success ==> %@", success);
-                        
-                        if(success == "1")
-                        {
-                            /*Show the successful result. */
-                            NSLog("Change Password Successfully");
-           
-                            let title = "Success!"
-                            let message = "Change Passsword Successfully!"
-                            sendAlertView(title, message: message)
+                interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedChangingPasswordResultFromRemoteServer, failToGetHttpResponse: self.failedToChangePassword)
 
-                        }
-                        else
-                        {
-                            var error_msg:NSString
-                            if jsonData["error_message"] as? NSString != nil {
-                                error_msg = jsonData["error_message"] as! NSString
-                            }
-                            else {
-                                
-                                error_msg = "Unknown Error"
-                                
-                            }
-                            
-                            let title = "Failed To Change Passsword!"
-                            let message = error_msg as String
-                            sendAlertView(title, message: message)
- 
-                        }
-                        dispatch_async(dispatch_get_main_queue(), {
-                            
-                            /*Set the current view controller as the main tab bar of the application. */
-                            appDelegate.window?.rootViewController = appDelegate.tabBarController
-                            //self.dismissViewControllerAnimated(true, completion: nil)
-                        })
-                    }
-  
-                    })
-                    
-                    task.resume()
-            }
+            } // end of if (changePasswordInfoValid)
 
-
-        }
+        }  // end of if identifier == "SegueFromChangePasswordVC" {
         
-        
-        // by default, transition
+
         return true
     }
 

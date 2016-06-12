@@ -12,11 +12,11 @@ class MULaunchViewController: UIViewController {
 
     
     
-    @IBAction func logOutFromSetting(segue:UIStoryboardSegue) {
-        
-
-        
-    }
+//    @IBAction func logOutFromSetting(segue:UIStoryboardSegue) {
+//        
+//
+//        
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

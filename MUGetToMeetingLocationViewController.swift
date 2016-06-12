@@ -36,9 +36,8 @@ class MUGetToMeetingLocationViewController: UIViewController, CLLocationManagerD
     
     let locationManager = CLLocationManager()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
+    /*Set location manager parameters for the map view. */
+    func setLocationManagerParameters(locationManager: CLLocationManager) -> Void {
         
         // Ask for Authorisation from the User. For use in background.
         locationManager.requestAlwaysAuthorization()
@@ -52,163 +51,33 @@ class MUGetToMeetingLocationViewController: UIViewController, CLLocationManagerD
             locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
             locationManager.startUpdatingLocation()
         }
-        
-      
+    }
+    
+
+
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        /*Set location manager parameters for the map view. */
+        setLocationManagerParameters(locationManager)
+
         self.MapView.delegate = self
         
         MapView.showsUserLocation = true  // used to show current user location.
         
-        NSLog("MapView.userLocation.latitude:%d", MapView.userLocation.coordinate.latitude)
-        NSLog("MapView.userLocation.longitude:%d", MapView.userLocation.coordinate  .longitude)
-        NSLog("currentUserAddressCoordinate.latitude:%d", currentUserAddressCoordinate.latitude)
-        NSLog("currentUserAddressCoordinate.longitude:%d", currentUserAddressCoordinate.longitude)
+        /*Show meeting location address in the map view. */
+        let destinationTitle = "Meeting Location"
         
-        /* Pass the information of meeting location coordinate to the MUGetToMeetingLocationViewController*/
-        let geocoder = CLGeocoder()
+        let showAddressResult = showDestinationLocationAddressInTheMapView(self.MapView, destinationLocationAddress: self.selectedMeetingLocationAddress!, destinationTitle: destinationTitle)
         
-        geocoder.geocodeAddressString(self.selectedMeetingLocationAddress!, completionHandler: {(placemarks, error) -> Void in
-            
-            NSLog("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-            
-            NSLog("Placemark count:%d",(placemarks?.count)!)
-            
-            
-            if((error) != nil)
-            {
-                NSLog("Error: %@",(error?.description)!)
-            }
-            
-            
-            
-            if((error) != nil){
-                print("Error", error)
-            }
-            
-            
-            if let placemark = placemarks?.first {
-                self.selectedMeetingLocationCoordinate = placemark.location?.coordinate
-                NSLog("selectedMeetingLocationCoordinate.latitude:%d", self.selectedMeetingLocationCoordinate.latitude)
-                NSLog("selectedMeetingLocationCoordinate.longitude:%d", self.selectedMeetingLocationCoordinate.longitude)
-                
-                if ((self.selectedMeetingLocationCoordinate) != nil){
-                    
-                    /*********Add annotation for destination meeting location to the map view.**************/
-                    let span = MKCoordinateSpanMake(0.02, 0.02)
-                    
-                    let region = MKCoordinateRegionMake(self.selectedMeetingLocationCoordinate, span)
-                    
-                    self.MapView.setRegion(region, animated: true)
-                    
-                    let annotation = MKPointAnnotation()
-                    annotation.coordinate = self.selectedMeetingLocationCoordinate
-                    annotation.title = "Meeting location"
-                    
-                    
-      
-                    
-                    self.MapView.addAnnotation(annotation)
-                    
-                    
-                    /*******Set route from current location to destination meeting location in the map view. ***********/
-                  //  let currentLocationCoordinate: CLLocationCoordinate2D = (self.MapView.userLocation.location?.coordinate)!
-                    
-                    let request = MKDirectionsRequest()
-                    request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: self.currentUserAddressCoordinate.latitude, longitude: self.currentUserAddressCoordinate.longitude), addressDictionary: nil))
-                    request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: self.selectedMeetingLocationCoordinate.latitude, longitude: self.selectedMeetingLocationCoordinate.longitude), addressDictionary: nil))
-                    
-                    //request.requestsAlternateRoutes = true
-                    request.requestsAlternateRoutes = false
-                    request.transportType = .Automobile
-                    
-                    let directions = MKDirections(request: request)
-                    
-                    directions.calculateDirectionsWithCompletionHandler { [unowned self] response, error in
-                        guard let unwrappedResponse = response else { return }
-                        
-                        
-                        for route in unwrappedResponse.routes {
-                            
-                            self.addEstimatedTimeArrivalToRoute(route)
-                            
-        
-                            self.MapView.addOverlay(route.polyline)
-
-
-                            self.MapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
-                            
-                            
-
-                        } // end of for route in unwrappedResponse.routes
-                    }  // end of directions.calculateDirectionsWithCompletionHandler
-                    
-                }// end of if ((selectedMeetingLocationCoordinate) != nil)
-                
-                
-            }
-        })
-        
-
-
-    }
-    
-    
-    func addEstimatedTimeArrivalToRoute(route: MKRoute) -> Void {
-        let points = route.polyline.points()
-        
-        let leftTime: String = getStandardTimeExpression(route.expectedTravelTime)  // estimated time arrival
-        
-        
-        let midPoint = points[route.polyline.pointCount/2]
-        
-        let midCoord: CLLocationCoordinate2D = MKCoordinateForMapPoint(midPoint)
-        
-      //  let annotation = myMapAnnotation(coordinate: midCoord, title: leftTime, subtitle: "")
-
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = midCoord
-        annotation.title = leftTime
-      //  annotation.subtitle = "ETS"
-    
-        
-        self.MapView.addAnnotation(annotation)
-        
-        self.MapView.selectAnnotation(annotation, animated: true)
-        
-    }
-    
-    
-    
-    func getStandardTimeExpression(leftTime: NSTimeInterval) -> String {
-        
-        var leftTimeExpression: String
-        
-        
-        let leftMin = (Int)(leftTime/60)
-        
-        if (leftMin < 60)
+        if (showAddressResult.findCoordinateFlag)
         {
-            
-            leftTimeExpression = String(format:"%d minutes", (Int)(leftTime/60))
+            showRouteFromCurrentLocationToDestinationLocation(self.MapView, currentUserAddressCoordinate: self.currentUserAddressCoordinate, destinationLocationCoordinate: showAddressResult.destinationCoordinate)
         }
-        else{
-            
-            let leftHour = (Int)(leftMin/60)
-            let remainMin = (Int)(leftMin%60)
-            
-            if (leftHour == 1)
-            {
-                leftTimeExpression = String(format:"%d hour %d minutes", leftHour, remainMin)
-            }
-            else{
-                
-                leftTimeExpression = String(format:"%d hours %d minutes", leftHour, remainMin)
-            }
-            
-        }
-        
-        return leftTimeExpression
-        
+ 
     }
+    
     
     
     func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {

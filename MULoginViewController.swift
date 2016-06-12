@@ -12,54 +12,62 @@ import FBSDKLoginKit
 
 class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginButtonDelegate{
 
-    @IBOutlet weak var LoginEmail: UITextField!
-   
-    @IBOutlet weak var LoginPassword: UITextField!
+    
+    
+    @IBOutlet var loginEmailText: UITextField!
+    
+    @IBOutlet var loginPasswordText: UITextField!
+    
     
     @IBOutlet var fbButtonInStoryboard: FBSDKLoginButton!
     
-    let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-    let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-    
-    
+    var loginEmail: String = ""
+    var loginPassword: String = ""
+
     @IBAction func Login(sender: AnyObject) {
-     
-        if (LoginEmail.text!.isEmpty) { //Check whether the Email is empty
-            
-            let alert = UIAlertView()
-            alert.title = "No Email"
-            alert.message = "You have to fill the Email!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
-            
-        }
-        else if (LoginPassword.text!.isEmpty){ //Check whether the password is empty
-
-            
-            let alert = UIAlertView()
-            alert.title = "No Password"
-            alert.message = "You have to fill the Password!"
-            alert.addButtonWithTitle("OK")
-            alert.show()
-            
-            
-        }
-        else
+        
+        let signInInputInfoValid = checkValidationForSignInInputInfo(loginEmailText, password: loginPasswordText)
+        
+        if (signInInputInfoValid)
         {
-            /* Get stored device token. */
-            let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-            let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-            let deviceToken = defaults.objectForKey(deviceTokenConstant) as! String?
             
-            loginApplication(deviceToken, userEmail: (LoginEmail.text!), userPassword: (LoginPassword.text!), loginWithFacebook: 0)
+            self.loginEmail = loginEmailText.text!
+            
+            self.loginPassword = loginPasswordText.text!
             
             
+            loginApplication((loginEmailText.text!), userPassword: (loginPasswordText.text!), loginWithFacebook: 0)
         }
-
+     
 
     }
     
+    /*Check the validation for the signin input information. */
+    func checkValidationForSignInInputInfo(email: UITextField, password: UITextField) -> Bool {
+        
+        if (email.text!.isEmpty) { //Check whether the Email is empty
+            
+            let title = "No Email"
+            let message = "You have to fill the Email!"
+            sendAlertView(title, message: message)
+            
+            return false
+            
+        }
+        
+        if (password.text!.isEmpty){ //Check whether the password is empty
 
+            let title = "No Password"
+            let message = "You have to fill the Password!"
+            sendAlertView(title, message: message)
+            
+            return false
+            
+        }
+        
+        return true
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,8 +92,8 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
 
         
         
-        self.LoginEmail.delegate = self;
-        self.LoginPassword.delegate = self;
+        self.loginEmailText.delegate = self;
+        self.loginPasswordText.delegate = self;
         
 
         // Do any additional setup after loading the view.
@@ -128,23 +136,16 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
                        // NSLog("fetched user: %@", result)
    
   
-                        let userName : NSString = result.valueForKey("name") as! NSString
-                        NSLog("User Name is: %@", userName)
+                  //      let userName : NSString = result.valueForKey("name") as! NSString
+                   //     NSLog("User Name is: %@", userName)
                
-                        let userEmail : NSString = result.valueForKey("email") as! NSString
-                        NSLog("User Email is: %@", userEmail)
- 
-                        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                        appDelegate.accountInfo = AccountInfo(Email: userEmail as String, Password: "")
+                        self.loginEmail = result.valueForKey("email") as! String
+                        NSLog("User Email is: %@", self.loginEmail)
                         
-                        appDelegate.accountInfo?.Email = userEmail as String
+                        self.loginPassword = ""
                         
-                        /* Get stored device token. */
-                        let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
-                        let deviceTokenConstant = "deviceTokenKey"   //Set constant for getting device token.
-                        let deviceToken = defaults.objectForKey(deviceTokenConstant) as! String?
                         
-                        self.loginApplication(deviceToken, userEmail: userEmail as String, userPassword: "", loginWithFacebook: 1)
+                        self.loginApplication(self.loginEmail, userPassword: self.loginPassword, loginWithFacebook: 1)
                
                     }
                 })// end of graphRequest.startWithCompletionHandler
@@ -162,138 +163,93 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
     
     }
     
-    func loginApplication(deviceToken: String!, userEmail: String, userPassword: String, loginWithFacebook: Int) {
+    
+    /*  Succeed to signin an account for meetup applicaiton. */
+    func succeedToSignIn(jsonData: NSDictionary) -> Void {
+        
+        /*Get AppDelegate. */
+        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        /*Set the bIsLogin in AppDelegate to true. */
+        appDelegate.bIsLogin = true
+        
+        /*Initial accountInfo object. */
+        appDelegate.accountInfo = AccountInfo(Email: self.loginEmail, Password: self.loginPassword)
+        
+        
+        /*Show the successful login result. */
+        NSLog("Login Success");
+        
+        
+        /******Initial viewcontroller in TabBar. *********/
+        let sentInvitationVC = self.storyboard!.instantiateViewControllerWithIdentifier("SentInvitationsVC") as! MUSentInvitationsTableViewController
+        
+        
+        let receivedInvitationVC = self.storyboard!.instantiateViewControllerWithIdentifier("ReceivedInvitationsVC") as! MUReceivedInvitationsTableViewController
+        
+        let settingsVC = self.storyboard!.instantiateViewControllerWithIdentifier("SettingsVC") as! MUSettingsTableViewController
+        
+        
+        self.tabBarController?.setViewControllers([sentInvitationVC, receivedInvitationVC, settingsVC], animated: false)
+        
+        /*Set the root view controller as the sent invitation view controller in tabbar. */
+        dispatch_async(dispatch_get_main_queue(), {
+            
+            self.view.endEditing(true) // This is used to hide keyboard.
+            
+            appDelegate.tabBarController?.selectedIndex = 0 // 0-send invitation viewcontroller, 1-received invitation viewcontroller, 2-settings.
+            
+            appDelegate.window?.rootViewController = appDelegate.tabBarController
+            
+        })
+
+    }
+    
+    /*  Failed to signin an account for meetup applicaiton. */
+    func failedToSignIn(errorMsg: NSString) -> Void {
+        
+        NSLog("Fail to sign up");
+        
+        let title = "Sign Up Failed!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
+
+    
+    /* Process the http response from remote server after sending http request which asked for signin an account. */
+    func receivedSignInResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode);
+        
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToSignIn, processFailureHttpResponse: self.failedToSignIn)
+        
+    
+    }
+    
+    func loginApplication(userEmail: String, userPassword: String, loginWithFacebook: Int) {
         
 
+        /* Get stored device token. */
+        let defaults = NSUserDefaults.standardUserDefaults()   //Set defaults to save and get data.
+        
+        let deviceToken = defaults.objectForKey(GlobalConstants.kdeviceToken) as! String?
         /* Send device token together with loginEmailand longinPassword to the provider through HTTP request message. */
         
         
-        let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/login.php")!
-        
-        //let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/login.php")!  // the web link of the provider.
-        
-        let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
-        
-        request.HTTPMethod = "POST";  //Post to PHP in provider.
-        
+        let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/login.php")!   // the web link of the provider.
+
         // Compose login information with device token, login Email, and loginPassword
         let postString: NSString = "devicetoken=\(deviceToken!)&sEmail=\(userEmail)&sPassword=\(userPassword)&iLoginWithFacebook=\(loginWithFacebook)"
-     //   let postString: NSString = "devicetoken=\(deviceToken!)&sEmail=\(LoginEmail.text!)&sPassword=\(LoginPassword.text!)"loginWithFacebook
-        
-        
-        //Set the login information as the HTTP body
-        request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-        
-        let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-        let postLength:NSString = String( postData.length )
-        request.addValue(postLength as String, forHTTPHeaderField: "Content-Length")
-        
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
-        
-        let session = NSURLSession.sharedSession()
-        
-        let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-            
-            print("error: \(error)")
-            
-            print("Response: \(response)")
-            let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-            print("Body: \(responseData)")
-            
-            
-            
-            let statusCode = (response as! NSHTTPURLResponse).statusCode
-            
-            NSLog("Response code: %ld", statusCode);
-            
-            if (statusCode >= 200 && statusCode < 300)
-            {
-                
-                let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                
-                
-                let success:NSString = jsonData.valueForKey("Success") as! NSString
-                
-                NSLog("Success ==> %@", success);
-                
-                
-                if(success == "1")
-                {
-                    /*Get AppDelegate. */
-                    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                    
-                    /*Set the bIsLogin in AppDelegate to true. */
-                    appDelegate.bIsLogin = true
-                    
-                    /*Initial accountInfo object. */
-                    appDelegate.accountInfo = AccountInfo(Email: userEmail, Password: userPassword)
-                    
-                    
-                    /*Show the successful login result. */
-                    NSLog("Login Success");
-                    
-                    
-                    /******Initial viewcontroller in TabBar. *********/
-                    let sentInvitationVC = self.storyboard!.instantiateViewControllerWithIdentifier("SentInvitationsVC") as! MUSentInvitationsTableViewController
-                    
-                    
-                    let receivedInvitationVC = self.storyboard!.instantiateViewControllerWithIdentifier("ReceivedInvitationsVC") as! MUReceivedInvitationsTableViewController
-                    
-                    let settingsVC = self.storyboard!.instantiateViewControllerWithIdentifier("SettingsVC") as! MUSettingsTableViewController
-                    
-                    
-                    self.tabBarController?.setViewControllers([sentInvitationVC, receivedInvitationVC, settingsVC], animated: false)
-                    
-                    
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        self.view.endEditing(true) // This is used to hide keyboard.
-                        
-                        appDelegate.tabBarController?.selectedIndex = 0 // 0-send invitation viewcontroller, 1-received invitation viewcontroller, 2-settings.
-                        
-                        appDelegate.window?.rootViewController = appDelegate.tabBarController
-                        
-                    })
-                    
-                }  // end of if(success == "1")
-                else
-                {
-                    var error_msg:NSString
-                    
-                    if jsonData["error_message"] as? NSString != nil
-                    {
-                        error_msg = jsonData["error_message"] as! NSString
-                    }
-                    else
-                    {
-                        error_msg = "Unknown Error"
-                    }
-                    
-                    let title = "Login Failed!"
-                    let message = error_msg as String
-                    sendAlertView(title, message: message)
-                    
-                }
-                
-            }// end of if (statusCode >= 200 && statusCode < 300)
-            else
-            {
-                let title = "Login Failed!"
-                let message = "Connection Failed"
-                sendAlertView(title, message: message)
-                
-            }
-            
-        })// end of task = session.dataTaskWithRequest
-        
-        task.resume()
-         
 
+
+        let request = createHttpPostRequest(url, postString: postString)
+        
+        interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedSignInResultFromRemoteServer, failToGetHttpResponse: self.failedToSignIn)
+        
+ 
     }
     
     
@@ -322,11 +278,6 @@ class MULoginViewController: UIViewController ,UITextFieldDelegate ,FBSDKLoginBu
 
     
     
-    func ProcessHttpPostResponseForLogin(statusCode: Int, data: NSData)  {
-
-        
-        
-    }
 
     /*
     // MARK: - Navigation

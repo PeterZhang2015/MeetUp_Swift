@@ -12,7 +12,10 @@ class MUDetailSentInvitationViewController: UIViewController {
     
     var AnInvitation: Invitation?
     
-    var sourceVC: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
+    var sourceVcType: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
+    
+    var selectedMeetingTime: String!
+    var selectedMeetingLocation: String!
     
     var HaveSelectedMeetingTime: Int? //    0-not selected, 1-selected
     var HaveSelectedMeetingLocation: Int? //    0-not selected, 1-selected
@@ -50,140 +53,114 @@ class MUDetailSentInvitationViewController: UIViewController {
         
     }
 
-    
-
-    
+ 
     @IBAction func CancelForDetailMeetingLocationVC(segue:UIStoryboardSegue) {
+        
     }
     
+    /*  Succeed to send the selected meeting time information to supported web server. */
+    func succeedToSendSelectedMeetingTimeInfo(jsonData: NSDictionary) -> Void {
+        
+        self.AnInvitation?.selectedMeetingTime = self.selectedMeetingTime!
+        
+    }
+    
+    
+    /*  Failed to send the selected meeting time information to supported web server. */
+    func failedToSendSelectedMeetingTimeInfo(errorMsg: NSString) -> Void {
+        
+        NSLog("Select meeting time Failed!");
+        
+        let title = "Select meeting time Failed!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
 
+    /* Process the http response from remote server after sending http request which sending the selected meeting time information to supported web server. */
+    func receivedSendingSelectedMeetingTimeResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode);
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToSendSelectedMeetingTimeInfo, processFailureHttpResponse: self.failedToSendSelectedMeetingTimeInfo)
+        
+    }
+    
     
     @IBAction func selectForDetailMeetingTimeVC(segue:UIStoryboardSegue) {
         
         let sourceVC:MUDetailMeetingTimeViewController = segue.sourceViewController as! MUDetailMeetingTimeViewController
-    
-        
-        self.HaveSelectedMeetingTime = 1 //    0-not selected, 1-selected
-        
-     //   let meetingTimeNum = sourceVC.meetingTimeArray.count
-        
-        
-      //  if (meetingTimeNum > 1) // Reset MeetingTime array by the selected meeting time.
-     //   {
+  
+        let meetingTimeNum = sourceVC.meetingTimeArray.count
+        if (meetingTimeNum == 0)
+        {
+            let title = "Set meeting time error!"
+            let message = "You have to set at least one meeting time!"
+            sendAlertView(title, message: message)
+        }
+        else
+        {
             let delegate:UIPickerViewDelegate = sourceVC.meetingTimePicker.delegate!
             
-    
-            let selectedMeetingTime: String = delegate.pickerView!(sourceVC.meetingTimePicker, titleForRow: sourceVC.meetingTimePicker.selectedRowInComponent(0), forComponent: 0)!
+            self.selectedMeetingTime = delegate.pickerView!(sourceVC.meetingTimePicker, titleForRow: sourceVC.meetingTimePicker.selectedRowInComponent(0), forComponent: 0)!
             
-            /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetingtime.php")!
+            self.HaveSelectedMeetingTime = 1 //    0-not selected, 1-selected
             
             
-            let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
+            /*Sending the added invitation to the supported web server. */
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/selectedmeetingtime.php")!
             
-            request.HTTPMethod = "POST";  //Post to PHP
-            
-            // Compose a query string
-     //       let postString: NSString = "sSelectedMeetingTime=\(selectedMeetingTime)"
-            
-
             let postString: NSString = "sSelectedMeetingTime=\(selectedMeetingTime)&iInvitationID=\(AnInvitation!.InvitationId)"
-
             
-            //Send selected meeting time to web server.
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+            let request = createHttpPostRequest(url, postString: postString)
             
-            let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-            let postLength:NSString = String( postData.length )
-            request.setValue(postLength as String, forHTTPHeaderField: "Content-Length")
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
+            interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedSendingSelectedMeetingTimeResultFromRemoteServer, failToGetHttpResponse: self.failedToSendSelectedMeetingTimeInfo)
             
             
-            let session = NSURLSession.sharedSession()
-            
-            let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-                
-                
-                print("Response: \(response)")
-                let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-                print("Body: \(responseData)")
-                
-                print("error: \(error)")
-                
-                let statusCode = (response as! NSHTTPURLResponse).statusCode
-                
-                NSLog("Response code: %ld", statusCode);
-                
-                if (statusCode >= 200 && statusCode < 300)
-                {
-                    let responseData:NSString  = NSString(data:data!, encoding:NSUTF8StringEncoding)!
-                    
-                    NSLog("Response ==> %@", responseData);
-                    
-                    //    var error: NSError?
-                    
-                    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                    
-                    print(jsonData.description )
-                    
-                    let success:NSString = jsonData.valueForKey("Success") as! NSString
-                    
-                    NSLog("Success ==> %@", success);
-                    
-                    if(success != "1")
-                    {
-                        var error_msg:NSString
-                        
-                        if jsonData["error_message"] as? NSString != nil {
-                            error_msg = jsonData["error_message"] as! NSString
-                        } else {
-                            error_msg = "Unknown Error"
-                        }
-                        
-                        let title = "Select meeting time Failed!"
-                        let message = error_msg as String
-                        sendAlertView(title, message: message)
-                        
-                    }
-                    else
-                    {
-                        
-                        self.AnInvitation?.selectedMeetingTime = selectedMeetingTime
-                    }
-                    
-                }
-                else
-                {
-                    let title = "Select meeting time Failed!"
-                    let message = "Error reponse!"
-                    sendAlertView(title, message: message)
-     
-                }
- 
-            })
-            
-            task.resume()
-    
-
             /******Reset meeting time array by selected meeting time. **********/
             AnInvitation!.MeetingTime.removeAll()
-    
+            
             AnInvitation!.MeetingTime.append(selectedMeetingTime)
-    
-     //   }
+        }
+        
 
 
     }
     
 
-        @IBAction func SelectForDetailMeetingLocationVC(segue:UIStoryboardSegue) {
+    /*  Succeed to send the selected meeting location information to supported web server. */
+    func succeedToSendSelectedMeetingLocationInfo(jsonData: NSDictionary) -> Void {
+        
+        self.AnInvitation?.selectedMeetingLocation = self.selectedMeetingLocation
+        
+    }
+    
+    
+    /*  Failed to send the selected meeting location information to supported web server. */
+    func failedToSendSelectedMeetingLocationInfo(errorMsg: NSString) -> Void {
+        
+        NSLog("Select meeting location Failed!");
+        
+        let title = "Select meeting location Failed!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
+    
+    /* Process the http response from remote server after sending http request which sending the selected meeting location information to supported web server. */
+    func receivedSendingSelectedMeetingLocaitonResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode)
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToSendSelectedMeetingLocationInfo, processFailureHttpResponse: self.failedToSendSelectedMeetingLocationInfo)
+        
+    }
+    
+    @IBAction func SelectForDetailMeetingLocationVC(segue:UIStoryboardSegue) {
     
         let sourceVC:MUDetailMeetingLocationViewController = segue.sourceViewController as! MUDetailMeetingLocationViewController
-        
-        
-
-           
             
         let meetingLocationNum = sourceVC.meetingLocationArray.count
         if (meetingLocationNum == 0)
@@ -196,109 +173,28 @@ class MUDetailSentInvitationViewController: UIViewController {
         {
     
             let delegate:UIPickerViewDelegate = sourceVC.meetingLocationPicker.delegate!
-            
-            
-            let selectedMeetingLocation: String = delegate.pickerView!(sourceVC.meetingLocationPicker, titleForRow: sourceVC.meetingLocationPicker.selectedRowInComponent(0), forComponent: 0)!
+         
+            self.selectedMeetingLocation = delegate.pickerView!(sourceVC.meetingLocationPicker, titleForRow: sourceVC.meetingLocationPicker.selectedRowInComponent(0), forComponent: 0)!
 
             self.HaveSelectedMeetingLocation = 1 //    0-not selected, 1-selected
+            
+
+            /*Set information after setting the meeting location. */
+            sourceVC.selectedMeetingLocation = selectedMeetingLocation
             sourceVC.GetToMeetLocationButton.hidden = false
             sourceVC.HaveSelected = 1  //    0-not selected, 1-selected
             
             AnInvitation?.selectedMeetingLocation = selectedMeetingLocation
             
-            /*Set information after setting the meeting location. */
-            sourceVC.selectedMeetingLocation = selectedMeetingLocation
-            
-            
             /* send data to web server. */
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/selectedmeetinglocation.php")!
-            
-            
-            let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
-            
-            request.HTTPMethod = "POST";  //Post to PHP
-            
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/selectedmeetinglocation.php")!
+
             // Compose a query string
-            //       let postString: NSString = "sSelectedMeetingTime=\(selectedMeetingTime)"
-            
-            
             let postString: NSString = "sSelectedMeetingLocation=\(selectedMeetingLocation)&iInvitationID=\(AnInvitation!.InvitationId)"
+
+            let request = createHttpPostRequest(url, postString: postString)
             
-            
-            //Send selected meeting time to web server.
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-            
-            let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-            let postLength:NSString = String( postData.length )
-            request.setValue(postLength as String, forHTTPHeaderField: "Content-Length")
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
-            
-            
-            let session = NSURLSession.sharedSession()
-            
-            let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-                
-                
-                print("Response: \(response)")
-                let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-                print("Body: \(responseData)")
-                
-                print("error: \(error)")
-                
-                let statusCode = (response as! NSHTTPURLResponse).statusCode
-                
-                NSLog("Response code: %ld", statusCode);
-                
-                if (statusCode >= 200 && statusCode < 300)
-                {
-                    let responseData:NSString  = NSString(data:data!, encoding:NSUTF8StringEncoding)!
-                    
-                    NSLog("Response ==> %@", responseData);
-                    
-                    //    var error: NSError?
-                    
-                    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                    
-                    print(jsonData.description )
-                    
-                    let success:NSString = jsonData.valueForKey("Success") as! NSString
-                    
-                    NSLog("Success ==> %@", success);
-                    
-                    if(success != "1")
-                    {
-                        var error_msg:NSString
-                        
-                        if jsonData["error_message"] as? NSString != nil {
-                            error_msg = jsonData["error_message"] as! NSString
-                        } else {
-                            error_msg = "Unknown Error"
-                        }
-                        
-                        let title = "Select meeting location Failed!"
-                        let message = error_msg as String
-                        sendAlertView(title, message: message)
-                        
-                    }
-                    else
-                    {
-                        
-                        self.AnInvitation?.selectedMeetingLocation = selectedMeetingLocation
-                    }
-                    
-                }
-                else
-                {
-                    let title = "Select meeting location Failed!"
-                    let message = "Error reponse!"
-                    sendAlertView(title, message: message)
-                    
-                }
-                
-            })
-            
-            task.resume()
+            interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedSendingSelectedMeetingLocaitonResultFromRemoteServer, failToGetHttpResponse: self.failedToSendSelectedMeetingLocationInfo)
             
             
             /******Reset meeting lcation array by selected meeting location. **********/
@@ -326,7 +222,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             detailMeetingTimeVC.meetingTimeArray = AnInvitation!.MeetingTime
 
-            detailMeetingTimeVC.sourceVC = self.sourceVC
+            detailMeetingTimeVC.sourceVcType = self.sourceVcType
             detailMeetingTimeVC.HaveSelected = self.HaveSelectedMeetingTime
             detailMeetingTimeVC.selectedMeetingTime = AnInvitation?.selectedMeetingTime
             
@@ -343,7 +239,7 @@ class MUDetailSentInvitationViewController: UIViewController {
             
             detailMeetingLocationVC.meetingLocationArray = AnInvitation!.MeetingLocation
             
-            detailMeetingLocationVC.sourceVC = self.sourceVC
+            detailMeetingLocationVC.sourceVcType = self.sourceVcType
             detailMeetingLocationVC.HaveSelected = self.HaveSelectedMeetingLocation
             
             detailMeetingLocationVC.selectedMeetingLocation = self.AnInvitation?.selectedMeetingLocation

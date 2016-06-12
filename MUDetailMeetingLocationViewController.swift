@@ -17,7 +17,7 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
 
     @IBOutlet var GetToMeetLocationButton: UIButton!
     
-    var sourceVC: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
+    var sourceVcType: Int? //    0-Sent Invitation VC, 1-Received Invitation VC
     
     var HaveSelected: Int? //    0-not selected, 1-selected
     
@@ -35,7 +35,7 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
         /*This one is imporant, otherwise program do not know about data source. */
         meetingLocationPicker.delegate = self
         
-        if ((self.sourceVC != 1) || (self.HaveSelected == 1))  // Need to hide the "Select" right bar button Item.
+        if ((self.sourceVcType != GlobalConstants.kReceivedInvitationVC) || (self.HaveSelected == 1))  // Need to hide the "Select" right bar button Item.
         {
             // let oldRightButtom: UIBarButtonItem = (self.navigationController?.navigationItem.rightBarButtonItem)!
             
@@ -90,9 +90,7 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
     
     
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        
-        
-        
+
         if ((self.HaveSelected != nil) && (self.HaveSelected == 1))
         {
             return selectedMeetingLocation
@@ -113,9 +111,6 @@ class MUDetailMeetingLocationViewController: UIViewController, UIPickerViewDeleg
             let destinationNavigationController:UINavigationController = segue.destinationViewController as! UINavigationController
             
             let getToMeetingLocationVC:MUGetToMeetingLocationViewController = destinationNavigationController.topViewController as! MUGetToMeetingLocationViewController
-            
-       //     let getToMeetingLocationVC:MUGetToMeetingLocationViewController = segue.destinationViewController as!MUGetToMeetingLocationViewController
-            
             
             getToMeetingLocationVC.selectedMeetingLocationAddress = selectedMeetingLocation
     

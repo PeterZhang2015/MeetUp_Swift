@@ -19,35 +19,13 @@ class MUSentInvitationsTableViewController: UITableViewController {
     
  
     @IBAction func cancelForDetailSentInvitationVC(segue:UIStoryboardSegue) {
-        
-        
-//        let sourceVC:MUDetailSentInvitationViewController = segue.sourceViewController as! MUDetailSentInvitationViewController
-//        
-//        if (sourceVC.sourceVC == 1)   //    0-Sent Invitation VC, 1-Received Invitation VC
-//        {
-//            
-//            //performSegueWithIdentifier("ReceivedInvitationsVC", sender: self)
-//           // dispatch_async(dispatch_get_main_queue(), {
-//            /*Get AppDelegate. */
-//            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-//            
-//            appDelegate.window?.makeKeyAndVisible()
-//            
-//            /*********** Way of transfering to a specific tabbar. *****************/
-//            appDelegate.tabBarController?.selectedIndex = 1 // 0-send invitation viewcontroller, 1-received invitation viewcontroller, 2-settings.
-//            appDelegate.window?.rootViewController = self.tabBarController
-//         //   })
-//        }
 
         
     }
     
 
-
-    
     @IBAction func cancelForAnSentInvitationVC(segue:UIStoryboardSegue) {
-        
-  
+
         
     }
     
@@ -81,6 +59,66 @@ class MUSentInvitationsTableViewController: UITableViewController {
 
     }
     
+    /*  Update Sent invitations table. */
+    func updateSentInvitationsTable(jsonData: NSDictionary) -> Void {
+        
+        let invitationNum = jsonData.valueForKey("invitationNum") as! Int
+        
+        let arraySentMeetingInfo = jsonData.valueForKey("arraySentMeetingInfo") as! NSArray
+        
+        self.Invitations.removeAll()
+        
+        for index in 0 ..< invitationNum
+        {
+            var oneRowInvitation: Invitation?
+            
+            oneRowInvitation = decodeInvitationInfo(arraySentMeetingInfo[index])
+            
+            self.Invitations.append(oneRowInvitation!)
+            self.tableView.reloadData()
+            
+        }
+    }
+    
+    /*  Succeed to get all sent invitation information. */
+    func succeedToGetAllSentInvitationInfo(jsonData: NSDictionary) -> Void {
+        
+        updateSentInvitationsTable(jsonData)
+        
+        self.haveGotSentInvitationInfo = true
+        
+        // It is used to trigger cellForRowAtIndexPath for updating table data in time.
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            
+            self.tableView.reloadData()
+            
+        })
+
+    }
+    
+    
+    /*  Failed to get all sent invitation information. */
+    func failedToGetAllSentInvitationInfo(errorMsg: NSString) -> Void {
+        
+        NSLog("Fail to get all sent invitation information.");
+        
+        let title = "Fail to get all sent invitation information!"
+        let message = errorMsg as String
+        sendAlertView(title, message: message)
+        
+    }
+    
+    /* Process the http response from remote server after sending http request which asked for all sent invitation information. */
+    func receivedAllSentInvitationInfoResultFromRemoteServer(data: NSData, response: NSURLResponse) -> Void {
+        
+        let statusCode = (response as! NSHTTPURLResponse).statusCode
+        NSLog("Response code: %ld", statusCode);
+        
+        processHttpResponseAccordingToStatusCode(statusCode, data: data, processSuccessfulHttpResponse: self.succeedToGetAllSentInvitationInfo, processFailureHttpResponse: self.failedToGetAllSentInvitationInfo)
+        
+    }
+
+    
     
     override func viewWillAppear(animated: Bool) {
         //super.viewWillAppear(animated);
@@ -94,131 +132,22 @@ class MUSentInvitationsTableViewController: UITableViewController {
         
         if ((self.haveGotSentInvitationInfo != true))
         {
-        
-            let url: NSURL = NSURL(string: "http://meetupappsupportedserver.com/getallsentinvitationinfo.php")! // the web link of the provider.
             
-            let request:NSMutableURLRequest = NSMutableURLRequest(URL:url)
-            
-            request.HTTPMethod = "POST";  //Post to PHP in provider.
-            
+            let url: NSURL = NSURL(string: "http://192.168.0.3.xip.io/~chongzhengzhang/php/getallsentinvitationinfo.php")! // the web link of the provider.
             
             /*Get AppDelegate. */
             let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            
             // Compose login information with device token, login Email, and loginPassword
             let postString: NSString = "sInviterEmail=\(appDelegate.accountInfo!.Email)"
-            
             NSLog("Input Email for querying sent invitation info ==> %@", appDelegate.accountInfo!.Email);
             
-            
-            //Set the login information as the HTTP body
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-            
-            let postData:NSData = postString.dataUsingEncoding(NSASCIIStringEncoding, allowLossyConversion:true)!
-            let postLength:NSString = String( postData.length )
-            request.addValue(postLength as String, forHTTPHeaderField: "Content-Length")
-            
-            request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.addValue("application/json", forHTTPHeaderField: "Accept")
-            
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.setValue("application/json", forHTTPHeaderField: "Accept")
-            
-            
-            let session = NSURLSession.sharedSession()
-            
-            let task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-                
-                print("error: \(error)")
-                
-                print("Response: \(response)")
-                let responseData = NSString(data: data!, encoding: NSUTF8StringEncoding)!
-                print("Body: \(responseData)")
-                
-        
-                let statusCode = (response as! NSHTTPURLResponse).statusCode
-                
-                NSLog("Response code: %ld", statusCode);
-                
-                if (statusCode >= 200 && statusCode < 300)
-                {
-                    
-                    let jsonData:NSDictionary = (try! NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers )) as! NSDictionary
-                    
-                    
-                    let success:NSString = jsonData.valueForKey("Success") as! NSString
-                    
-                    NSLog("Success ==> %@", success);
-                    
-                    
-                    if(success == "1")
-                    {
-
-                        /*Show the successful login result. */
-                        NSLog("Get sent invitation info Successfully!");
-
-                        let invitationNum = jsonData.valueForKey("invitationNum") as! Int
-                        
-                        let arraySentMeetingInfo = jsonData.valueForKey("arraySentMeetingInfo") as! NSArray
-                        
-                        self.Invitations.removeAll()
-
-                        for index in 0 ..< invitationNum
-                        {
-                            let invitationID:NSNumber = arraySentMeetingInfo[index]["InvitationId"] as! NSNumber
-                            let meetingName:String = arraySentMeetingInfo[index]["MeetingName"] as! String
-                            let meetingDescription:String = arraySentMeetingInfo[index]["MeetingDescription"] as! String
-                            let meetingTime:[String] = arraySentMeetingInfo[index]["MeetingTime"] as! [String]
-                            let meetingLocation:[String] = arraySentMeetingInfo[index]["MeetingLocation"] as! [String]
-                            let invitedFriendEmail:String = arraySentMeetingInfo[index]["InvitedFriendEmail"] as! String
-                            let inviterFriendEmail:String = arraySentMeetingInfo[index]["InviterFriendEmail"] as! String
-                            let haveSelectedMeetingTimeFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingTimeFlag"] as! Bool
-                            let haveSelectedMeetingLocationFlag:Bool = arraySentMeetingInfo[index]["haveSelectedMeetingLocationFlag"] as! Bool
-                            
-//                           let selectedMeetingTime:String = ""
-//                            
-//                                if(haveSelectedMeetingTimeFlag)
-//                                {
-                                    let selectedMeetingTime:String = arraySentMeetingInfo[index]["selectedMeetingTime"] as! String
-//                                }
-              
-//                            let selectedMeetingLocation:String = ""
-//                                if(haveSelectedMeetingLocationFlag)
-//                                {
-                                    let selectedMeetingLocation:String = arraySentMeetingInfo[index]["selectedMeetingLocation"] as! String
-//                                }
-             
-                            var oneRowInvitation: Invitation?
-                            
-                            oneRowInvitation = Invitation(InvitationId: invitationID,MeetingName: meetingName, MeetingDescription: meetingDescription, MeetingTime: meetingTime, MeetingLocation: meetingLocation, InvitedFriendEmail: invitedFriendEmail, InviterFriendEmail: inviterFriendEmail,selectedMeetingTime: selectedMeetingTime, selectedMeetingLocation: selectedMeetingLocation, haveSelectedMeetingTimeFlag:haveSelectedMeetingTimeFlag, haveSelectedMeetingLocationFlag:haveSelectedMeetingLocationFlag)
-                            
-                            self.Invitations.append(oneRowInvitation!)
-                            self.tableView.reloadData()
-                            
-                        }
-                        
-                        self.haveGotSentInvitationInfo = true
-           
-                        // It is used to trigger cellForRowAtIndexPath for updating table data in time.
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            
-                            self.tableView.reloadData()
-                            
-                        })
-                        
-                        
-
-                    }  // end of if(success == "1")
-                    
-                }// end of if (statusCode >= 200 && statusCode < 300)
-
-                
-            })
-            
-            task.resume()
-        }
+            let request = createHttpPostRequest(url, postString: postString)
         
 
+            interactionWithRemoteServerWithoutInvitationThroughHttpPost(request,  processResponseFunc: self.receivedAllSentInvitationInfoResultFromRemoteServer, failToGetHttpResponse: self.failedToGetAllSentInvitationInfo)
+            
+        }  // end of if ((self.haveGotSentInvitationInfo != true))
+ 
     }
 
     override func didReceiveMemoryWarning() {
@@ -282,7 +211,7 @@ class MUSentInvitationsTableViewController: UITableViewController {
             let detailSentInvitationVC:MUDetailSentInvitationViewController = segue.destinationViewController as! MUDetailSentInvitationViewController
             
             detailSentInvitationVC.AnInvitation = self.SelectRowInvitation
-            detailSentInvitationVC.sourceVC = 0  // 0-Sent Invitation VC, 1-Received Invitation VC
+            detailSentInvitationVC.sourceVcType = GlobalConstants.kSentInvitationVC  // 0-Sent Invitation VC, 1-Received Invitation VC
             
             if (self.SelectRowInvitation?.haveSelectedMeetingLocationFlag == true)
             {
