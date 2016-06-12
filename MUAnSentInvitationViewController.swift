@@ -238,6 +238,11 @@ class MUAnSentInvitationViewController: UIViewController ,UITextFieldDelegate, U
                 
                 
             }       // end of if (addedInvitationValid)
+            else
+            {
+                
+                return false
+            }
 
 
             return true
